@@ -20,7 +20,6 @@ private:
         node *prev;
         node *next;
     };
-    
     node *head;
     
 public:
@@ -31,6 +30,7 @@ public:
     
 	void createList(T*,T*,T*,int);
 	doublylinkedlist<T> copyList(int start, int end);
+    doublylinkedlist<int> removeParts(doublylinkedlist<int> t1, doublylinkedlist<int> p2);
 	void insertAfter(T,T,T,T);
 	void displayforward();
 	void displaybackward();
@@ -45,11 +45,13 @@ public:
 	void showDistance();
 	void deleteNode(T);
 	void rearrangeList();
-    
-    void starOpt(int);
+    void starOpt(int K,int LISTSIZE);
     void flipKItems(int, int*);
-    
+    void extractIndices(int*);
+    void appendList(doublylinkedlist<int>);
+    void getContentAt(T, int arr[3]);
 };
+
 
 //create list inputs an array of indices, these indices will be stored as data
 //it also stores and the x,y positions of the points via input x and y arrays.
@@ -135,14 +137,14 @@ doublylinkedlist<T> doublylinkedlist<T>::copyList(int start, int end)
 	int count = 0;
 
 	for(p = pStart; p!= pEnd; p = p-> next) {
-		cout<<"data "<<p->data<<"("<<p->x<<","<<p->y<<")"<<endl;
+		//cout<<"data "<<p->data<<"("<<p->x<<","<<p->y<<")"<<endl;
 		ind.push_back((int) p->data);
 		x.push_back((int) p->x);
 		y.push_back((int) p->y);
 		count++;
 	}
 	
-		cout<<"data "<<p->data<<"("<<p->x<<","<<p->y<<")"<<endl;
+		//cout<<"data "<<p->data<<"("<<p->x<<","<<p->y<<")"<<endl;
 		ind.push_back(p->data);
 		x.push_back(p->x);
 		y.push_back(p->y);
@@ -151,19 +153,15 @@ doublylinkedlist<T> doublylinkedlist<T>::copyList(int start, int end)
 	T* arr = &ind[0];
 	T* xPos = &x[0];
 	T* yPos = &y[0];
-	cout<<"array done! "<<endl;
+//	cout<<"array done! "<<endl;
 	
 	for(int i = 0; i < count; i++){
 		cout<<"arr: "<<arr[i]<< " xPos: "<<xPos[i]<<" yPos: "<<yPos[i]<<endl;		
 	}
-	cout<< "finish"<<endl;
+//	cout<< "finish"<<endl;
 	copied.createList(arr,xPos,yPos,count);
 	return copied;
 }
-
-
-
-
 
 
 template<class T>
@@ -250,28 +248,20 @@ void doublylinkedlist<T>::rayOpt()
 }
 
 template<class T>
-void doublylinkedlist<T>::starOpt(int K)
+void doublylinkedlist<T>::starOpt(int K,int LISTSIZE)
 {
     int num_nodes = countNodes();
-    
-    // Find number of possible pairs
-    vector < vector <int> > pairs;
-    
-    int i,j,k,m,n = 0;
+    int i,k,m,n = 0;
     int temp[2*K];
-    int flag;
-    int matches;
+    int flag,trial,matches;
+    float current_distance = 0; // starting distance
+    float best_distance = getDistance(); // starting best distance
+    vector < vector <int> > pairs;
+    doublylinkedlist<int> tempList;
     
-    float current_distance = getDistance(); // starting distance
-    float best_distance = current_distance; // starting best distance
-    
-    while (1) {
-        // Display linked list
-        displayforward();
-        printf(", Distance = %f",current_distance);
-        printf("\n");
-        
-        
+    displayforward();
+    printf(", Distance = %f\n",best_distance);
+    for (trial=0;trial<20;trial++) {
         // Find K pairs
         k = 0;
         while (k<K) {
@@ -283,11 +273,13 @@ void doublylinkedlist<T>::starOpt(int K)
             }
             if (flag==0) k++;
         }
+        
+        // Make sure pairs have not been seen in history
         flag = 0;
-        for (int m = 0;m < n;m++) {
+        for (m=0;m<n;m++) {
             matches = 0;
-            for (int k=0;k < K;k++) {
-                for (int i=0;i < K;i++) {
+            for (k=0;k<K;k++) {
+                for (i=0;i<K;i++) {
                     matches += temp[2*i]==pairs[m][2*k];
                 }
             }
@@ -299,33 +291,35 @@ void doublylinkedlist<T>::starOpt(int K)
         
         // Test pairs
         if (flag==0) {
-            flipKItems(K,temp);
-            current_distance = getDistance();
+            printf("BEST LIST = ");
+            displayforward();
+            tempList = copyList(0,LISTSIZE-1);
+            tempList.flipKItems(K,temp);
+            current_distance = tempList.getDistance();
+            printf("CURRENT LIST = ");
+            tempList.displayforward();
+            printf(", Distance = %f",current_distance);
             
-            
-            //            // Keep flip and store in history if distance is improved, else revert
-            //            if (current_distance<best_distance) {
-            //                best_distance = current_distance; // Update best distance
-            //                printf("FLIPPING: ");
-            //                pairs.resize(n+1);
-            //                for (m=0;m<=n;m++) {
-            //                    pairs.at(m).resize(2*K);
-            //                }
-            //                for (k=0;k<K;k++) {
-            //                    pairs[n][2*k] = temp[2*k];
-            //                    pairs[n][2*k+1] = temp[2*k+1];
-            //                    printf("(%2d,%2d)",pairs[n][2*k],pairs[n][2*k+1]);
-            //                }
-            //                printf(", Distance = %f\n",best_distance);
-            //
-            //                // FINALIZE FLIP PAIR SET HERE!
-            //                n++;
-            //            } else {
-            //                // FLIP TEMPS BACK
-            //            }
+            // Keep flip and store in history if distance is improved, else revert
+            if (current_distance<best_distance) {
+                best_distance = current_distance; // Update best distance
+                pairs.resize(n+1);
+                for (m=0;m<=n;m++) {
+                    pairs.at(m).resize(2*K);
+                }
+                for (k=0;k<K;k++) {
+                    pairs[n][2*k] = temp[2*k];
+                    pairs[n][2*k+1] = temp[2*k+1];
+                }
+                n++;
+                flipKItems(K,temp);
+                printf(" (BEST)");
+            }
+            printf("\n");
         }
     }
 }
+
 
 
 template<class T>
@@ -357,11 +351,6 @@ void doublylinkedlist<T>::flipKItems(int K, int *temp) {
         root[k]->next->prev = root[k];
     }
     
-    //            printf(" :(");
-    //            for (k=0;k<K;k++) {
-    //                printf("%d->%d ",root[k]->data,root[k]->next->data);
-    //            }
-    //            printf(")\n");
 }
 
 
@@ -696,7 +685,6 @@ void doublylinkedlist<T>::showDistance() {
 }
 
 
-
 //delete the ith node of the list
 template<class T>
 void doublylinkedlist<T>::deleteNode(T i){ 
@@ -711,8 +699,52 @@ void doublylinkedlist<T>::deleteNode(T i){
 		}
 	}
 	p -> prev -> next = p -> next;
-	p -> next -> prev = p -> prev;	
+	p -> next -> prev = p -> prev;
+    if(p == head)
+        head = head-> next;
 }
+
+
+//returns an integer array of the array
+template<class T>
+void doublylinkedlist<T>::extractIndices(int* arr){
+    arr[0] = ((int)head->data);
+    node* p = head-> next;
+    int count = 1;
+    while (p!= head) {
+        arr[count]=((int)p->data);
+        p = p->next;
+        count ++;
+    }
+}
+
+//append list L2 to this function
+template<class T>
+void doublylinkedlist<T>::appendList(doublylinkedlist<int> l2){
+    node* end = head-> prev;
+    int num = l2.countNodes();
+    cout<<num<<" == number of l2"<<endl;
+    for (int i=0; i< num; i++) {
+        int arr[3];
+        l2.getContentAt(i, arr);
+        int lastKey = head-> prev->data;
+        cout<<"Got data " << arr[0]<<","<<arr[1]<<","<<arr[2]<<endl;
+        insertAfter(arr[0], arr[1], arr[2], lastKey);
+    }
+}
+
+//get the content of key, x and y at the nodeCount (0 to numNodes-1)
+template<class T>
+void doublylinkedlist<T>::getContentAt(T nodeCount, int arr[3]){
+    node* p = head;
+    for (int i = 0; i < nodeCount; i++) {
+        p= p-> next;
+    }
+    arr[0] = p-> data;
+    arr[1] = p-> x;
+    arr[2] = p-> y;
+}
+
 
 
 #endif

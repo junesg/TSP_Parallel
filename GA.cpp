@@ -11,16 +11,21 @@
 //#endif
 
 #define CROSSK 0.30
+#define POPULATION 5;
+#define breedPop 30;
+#define mutation_perc 10;
+#define Iteration 100;
+
 
 using namespace std;
+
+doublylinkedlist<int> crossOver1(doublylinkedlist<int> p1,doublylinkedlist<int> p2);
 doublylinkedlist<int> GenerateOneSpecies(std::vector<pair<int,int> > coordinates,int seed);
 vector<doublylinkedlist<int> >  GenerateInitPopulation(std::vector <pair<int,int> > coordinates);
 void sortPopDistance(vector< doublylinkedlist<int> >  *list, vector<float> *distances, int left, int right);
 int myrandom (int i);
-#define POPULATION 100;
-#define breedPop 30;
-#define mutation_perc 10;
-#define Iteration 100;
+
+
 
 //Overal GA function
 int main(){
@@ -37,8 +42,6 @@ int main(){
 	vector<float> distances;
 	for (vector<doublylinkedlist<int> >::iterator it=group.begin(); it!= group.end(); it++) {
 		(*it).displayforward();	
-		cout<<endl;	
-		(*it).showDistance();
 		cout<<endl;
 		cout<<(*it).getDistance()<<endl;
 		distances.push_back((*it).getDistance());
@@ -46,9 +49,29 @@ int main(){
 	
 	sortPopDistance(&group, &distances,0,n);
 
-	//combine for breading ##############3
+    for (vector<doublylinkedlist<int> >::iterator it=group.begin(); it!= group.end(); it++) {
+        (*it).displayforward();
+        cout<<endl;
+    }
     
-
+    
+    //combine for breeding ##############3
+    //NEED TO DO: to select a pair randomly from the population.
+    //to vary K randomly between 0.3 to 0.5
+    //examples of cross over shown:
+    doublylinkedlist<int> newlist;
+    cout<<"Appending: ";
+    group.at(0).displayforward();
+    cout<< " and ";
+    group.at(1).displayforward();
+    cout<<endl;
+    newlist = crossOver1(group.at(0) , group.at(1));
+    newlist.displayforward();
+    
+    //Now mutation.
+    //do a random flipping of nodes
+    //using the flipping funcion
+    //Random generate 2 numbers, and flips them 
 
 
 
@@ -70,26 +93,62 @@ int main(){
 
 doublylinkedlist<int> crossOver1(doublylinkedlist<int> p1,doublylinkedlist<int> p2){
 	
-    int length = p1.countNodes;
+    int length = p1.countNodes();
 	int start = 0;
 	int breakPt = (int)length*CROSSK;
 	int end = length-1;
 	
-    
+    //t1 is the part used, t2 is the part thrown away
     doublylinkedlist<int> t1 = p1.copyList(0,breakPt);
-    doublylinkedlist<int> t2 = p1.copyList(breakPt+1,end);
+    doublylinkedlist<int> t2 = p2.copyList(0, length-1);
     
+    //cout<<"DEBUG1: "; t1.displayforward();
+   // cout<<"DEBUG2: "; t2.displayforward();
+
+    int indices[breakPt+1];
+    int content[3];
+    t1.extractIndices(indices);
+   // cout<<"count node: "<<breakPt+1<<" is the same as "<<t1.countNodes()<<endl;
+    //before dlete
+    cout<< "BEFOE DELETE t2 = ";
+    t2.displayforward();
+    for (int i = 0 ; i <= breakPt; i++) {
+        t2.deleteNode(indices[i]);
+        cout<<"deleted "<<indices[i]<<endl;
+    }
+    cout<<"t2 is now ";
+    t2.displayforward();
+    cout<<endl;
+    cout<<"before appending t1: "<<endl;
+    t1.displayforward();
+    cout<<endl;
+    t1.appendList(t2);
+    cout<<"ater appending to t1 : "<<endl;
+    t1.displayforward();
+    cout<<endl;
+
+    return t1;
 }
 
 
-doublylinkedlist<int> crossOver2(doublylinkedlist<int> p1,doublylinkedlist<int> p2){
+
+
+
+
+
+/*
+;<int> crossOver2(doublylinkedlist<int> p1,doublylinkedlist<int> p2){
     
+    
+    
+    
+
     
     
     
     
 }
-
+*/
 
 //Genetic Algorithm
 
