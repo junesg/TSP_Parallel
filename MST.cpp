@@ -56,6 +56,10 @@ int main(){
 	std::vector< std::pair<int,int> > mstsolution = kurskalsAlgo(&edgeWeight, &vertexPair, &coordinates, &set);
 
     
+    
+    
+    
+    
 
    
 	return 0;

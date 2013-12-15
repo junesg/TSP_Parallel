@@ -1,11 +1,13 @@
 #ifndef DLL_H
 #define DLL_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
 #include <math.h>
 #include <vector>
 using namespace std;
+
 
 struct node {   //node struct, has data in it and has pointers to previous and next nodes
     int data;
@@ -28,6 +30,7 @@ public:
     
    	void createList(int*,int*,int*,int);
     void destroy();
+    ~doublylinkedlist(){};
 
     doublylinkedlist removeParts(doublylinkedlist t1, doublylinkedlist p2);
 	void insertAfter(int,int, int, int);
@@ -35,21 +38,21 @@ public:
 	void displaybackward();
     int countNodes();
     int getNextIndex(int);
-    void findKPairs(int, vector<vector<int> > *);
-    void findPairs(vector<vector<int> > *);
     float getDistance();
 	void flipTwoItems(const int,const int,const int,const int);
-    void flipNodes(int,int);
 	void showDistance();
 	void deleteNode(int);
 	void rearrangeList();
-    void rayOpt(int);
-    void starOpt(int,int);
-    void flipKItems(int, int*);
     void extractIndices(int*);
     void appendList(doublylinkedlist);
     void getContentAt(int, int arr[3]);
+    
+    void flipNodes(int,int);
+    void flipKItems(int,int*);
+
 };
+
+
 
 
 
@@ -83,7 +86,6 @@ void doublylinkedlist::createList(int* ind, int* x, int* y, int n)
 
 }
 
-
 //This function is a self-destruction function of the inner contents of the doublylinkedlist
 void doublylinkedlist::destroy(){
     node *p, *q;
@@ -94,13 +96,9 @@ void doublylinkedlist::destroy(){
         delete q;
     }
     delete p;
-    head= NULL;
+    head =  NULL;
     end = NULL;
 }
-
-
-
-
 
 void doublylinkedlist::rearrangeList(){
 	//Now loop through to make sure head is always the 0_th item
@@ -113,139 +111,6 @@ void doublylinkedlist::rearrangeList(){
 	    head = p;
 	}
 }
-
-
-
-void doublylinkedlist::flipKItems(int K, int *temp) {
-    node *p = head;
-    node *root[K];
-    node *temp_root[K];
-    int j,k;
-    j = 0;
-    while (1) {
-        for (k=0;k<K;k++) {
-            if (p->data==temp[2*k]) {
-                root[j] = p;
-                temp_root[j] = p->next;
-                //printf("(%2d,%2d)",temp[2*k],temp[2*k+1]);
-                j++;
-                break;
-            }
-        }
-        p=p->next;
-        if (p==head) break;
-    }
-    
-    root[0]->next = temp_root[K-2];
-    root[1]->next = temp_root[K-1];
-
-    for (k=0;k<K;k++) {
-        if (k>=2) root[k]->next = temp_root[k-2];
-        root[k]->next->prev = root[k];
-    }
-    
-}
-
-
-
- 
-void doublylinkedlist::findKPairs(int K, vector<vector<int> > *pairs) {
-    int num_nodes = countNodes();
-
-    int i,k,m,n = 0;
-    int temp[2*K];
-    int flag;
-    int matches;
-
-    while (n < 10) {
-        k = 0;
-        while (k<K) {
-            flag = 0;
-            
-            temp[2*k] = rand() % num_nodes;
-            temp[2*k+1] = getNextIndex(temp[2*k]);
-        
-            // Make sure pairs have not been seen in current set
-            for (i=0;i<k;i++) {
-                if (temp[2*i]==temp[2*k] || temp[2*i+1]==temp[2*k] || temp[2*i]==temp[2*k+1] || temp[2*i+1]==temp[2*k+1]) flag = 1;
-            }
-        
-            if (flag==0) k++;
-        }
-        
-        // Make sure valid pair set has not been seen in history - NOTE: DEBUG THIS!!!!!!!!!!!!!!!
-        flag = 0;
-        for (int m = 0;m < n;m++) {
-            matches = 0;
-            for (int k=0;k < K;k++) {
-                for (int i=0;i < K;i++) {
-                    matches += temp[2*i]==(*pairs)[m][2*k];
-                }
-            }
-            if (matches==K) {
-                flag = 1;
-                break;
-            }
-        }
-        
-        // Record pair
-        if (flag==0) {
-            (*pairs).resize(n+1);
-            for (int m=0;m<=n;m++) {
-                (*pairs).at(m).resize(2*K);
-            }
-            for (k=0;k<K;k++) {
-                (*pairs)[n][2*k] = temp[2*k];
-                (*pairs)[n][2*k+1] = temp[2*k+1];
-                printf("(%2d,%2d) %d",(*pairs)[n][2*k],(*pairs)[n][2*k+1],n);
-            }
-            printf("\n");
-            n++;
-        }
-    }
-}
-
-
- 
-void doublylinkedlist::findPairs(vector<vector<int> > *pairs) {
-    int num_nodes = countNodes();
-    int i,j,k,l,m,n = 0;
-    int temp[4];
-    int flag;
-    for (i=0;i<num_nodes;i++) {
-        for (j=0;j<num_nodes;j++) {
-            flag = 0;
-            temp[0] = i;
-            temp[1] = getNextIndex(temp[0]);
-            temp[2] = j;
-            temp[3] = getNextIndex(temp[2]);
-            
-            // Make sure no two nodes are the same
-            for (k=0;k<4;k++) {
-                for (l=0;l<4;l++) {
-                    if (k!=l && temp[k]==temp[l]) flag = 1;
-                }
-            }
-            
-            // Make sure pair hasn't been seen before
-            for (m=0;m<n;m++) {
-                if (temp[0]==(*pairs)[m][0] && temp[1]==(*pairs)[m][1] && temp[2]==(*pairs)[m][2] && temp[3]==(*pairs)[m][3]) flag = 1;
-                if (temp[0]==(*pairs)[m][2] && temp[1]==(*pairs)[m][3] && temp[2]==(*pairs)[m][0] && temp[3]==(*pairs)[m][1]) flag = 1;
-            }
-            
-            // Record pair
-            if (flag==0) {
-                (*pairs)[n][0] = temp[0];
-                (*pairs)[n][1] = temp[1];
-                (*pairs)[n][2] = temp[2];
-                (*pairs)[n][3] = temp[3];
-                n++;
-            }
-        }
-    }
-}
-
-
 
 int doublylinkedlist::getNextIndex(int n)
 {
@@ -263,21 +128,21 @@ int doublylinkedlist::getNextIndex(int n)
     return m;
 }
 
-
 //This function counts the number of nodes in the linkedlist
 int doublylinkedlist::countNodes() {
     node *p = head;
     p = p->next;
     int num_nodes = 1;
-    while(p!=head) {
+    while(p!=end) {
         num_nodes++;
         p = p->next;
     }
+    num_nodes++;
     return num_nodes;
 }
 
 
- 
+//This function returns the distance of a tour of the linkedlist
 float doublylinkedlist::getDistance() {
     node *p;
     float distance = 0;
@@ -285,15 +150,13 @@ float doublylinkedlist::getDistance() {
     while (1) {
         distance += sqrt(pow(p->x - p->next->x,2)+pow(p->y - p->next->y,2));
         p=p->next;
-        if (p==head) break;
+        if (p==end) break;
     }
+    distance +=sqrt(pow(head->x - end->x,2)+pow(head->y - end->y,2));
     return distance;
 }
 
-
-
 //Insert item after key
-
 void doublylinkedlist::insertAfter(int item, int x, int y, int key) {
 	node *q=head;
 	int head2 = 0;
@@ -319,20 +182,23 @@ void doublylinkedlist::insertAfter(int item, int x, int y, int key) {
 	q->next=p;
 }
 
-//diaplaying list nodes in forward direction
- 
+//displaying list nodes in forward direction
 void doublylinkedlist::displayforward() {
 	node *p=head;
+    if (head == NULL) {
+        printf("Can not display\n");
+        return;
+    }
 	while(1) {
         printf("%d ",p->data);
         //printf("%d (%d,%d), ",p->data,p->x,p->y);
         p=p->next;
         if (p==NULL || p==head) break;
 	}
+
 }
 
 //displaying list nodes in reverse direction
- 
 void doublylinkedlist::displaybackward() {
 	node *p=head->prev;
 	while(1) {
@@ -344,7 +210,6 @@ void doublylinkedlist::displaybackward() {
 
 //fliping two edges according to 2opt
 //This function takes in (pair12,pair22) and (pair21,pair22) and flips them
- 
 void doublylinkedlist:: flipTwoItems(const int pair11, const int pair12, const int pair21, const int pair22){
 	node *p11, *p12, *p21, *p22;
 	p11 = p12 = p21 = p22 = NULL;
@@ -435,8 +300,6 @@ void doublylinkedlist:: flipTwoItems(const int pair11, const int pair12, const i
         
 	}
 }
-
-
  
 void doublylinkedlist::showDistance() {
     node *p;
@@ -450,9 +313,7 @@ void doublylinkedlist::showDistance() {
     }
 }
 
-
-//delete the ith node of the list
- 
+//delete the ith node of the list 
 void doublylinkedlist::deleteNode(int i){
 	node *p;
 	p = head;
@@ -473,13 +334,7 @@ void doublylinkedlist::deleteNode(int i){
 
 }
 
-
-
-
-
-
 //returns an integer array of the array
- 
 void doublylinkedlist::extractIndices(int* arr){
     arr[0] = ((int)head->data);
     node* p = head-> next;
@@ -491,11 +346,7 @@ void doublylinkedlist::extractIndices(int* arr){
     }
 }
 
-
-
-
 //append list L2 to this function
- 
 void doublylinkedlist::appendList(doublylinkedlist l2){
     
     
@@ -510,7 +361,6 @@ void doublylinkedlist::appendList(doublylinkedlist l2){
             //cout<<"Got data " << arr[0]<<","<<arr[1]<<","<<arr[2]<<endl;
             insertAfter(arr[0], arr[1], arr[2], lastKey);
         }
-
     }
     else {
         int num = l2.countNodes();
@@ -528,15 +378,10 @@ void doublylinkedlist::appendList(doublylinkedlist l2){
             //cout<<"Got data " << arr[0]<<","<<arr[1]<<","<<arr[2]<<endl;
             insertAfter(arr[0], arr[1], arr[2], lastKey);
         }
-        
     }
-    
-    
-    
 }
 
 //get the content of key, x and y at the nodeCount (0 to numNodes-1)
- 
 void doublylinkedlist::getContentAt(int nodeCount, int arr[3]){
     node* p = head;
     for (int i = 0; i < nodeCount; i++) {
@@ -549,5 +394,69 @@ void doublylinkedlist::getContentAt(int nodeCount, int arr[3]){
 
 
 
+//This function flips four edges with center n1, n3
+// for instance, flipping 3,7 from 0-1-2-...-7
+// then we end up changing edges (2,3)(3,4) and edges (6,7)(7,0)
+//Done by TR.
 
+void doublylinkedlist::flipNodes(int n1, int n3) {
+    
+    node *p, *p1, *p3, *temp0, *temp1, *temp2, *temp3;
+    p = head;
+    while (1) {
+        if (p->data==n1) p1 = p;
+        else if (p->data==n3) p3 = p;
+        p=p->next;
+        if (p==head) break;
+    }
+    
+    temp0 = p1->prev;
+    temp1 = p1->next;
+    temp2 = p3->prev;
+    temp3 = p3->next;
+    
+    p1->prev->next = p3;
+    p1->next->prev = p3;
+    p1->prev = temp2;
+    p1->next = temp3;
+    
+    p3->prev->next = p1;
+    p3->next->prev = p1;
+    p3->prev = temp0;
+    p3->next = temp1;
+}
+
+
+
+
+void doublylinkedlist::flipKItems(int K, int *temp) {
+    node *p = head;
+    node *root[K];
+    node *temp_root[K];
+    int j,k;
+    j = 0;
+    while (1) {
+        for (k=0;k<K;k++) {
+            if (p->data==temp[2*k]) {
+                root[j] = p;
+                temp_root[j] = p->next;
+                j++;
+                break;
+            }
+        }
+        p=p->next;
+        if (p==head) break;
+    }
+    
+    root[0]->next = temp_root[K-2];
+    root[1]->next = temp_root[K-1];
+    
+    for (k=0;k<K;k++) {
+        if (k>=2) root[k]->next = temp_root[k-2];
+        root[k]->next->prev = root[k];
+    }
+    end = head -> prev;
+}
+    
+    
 #endif
