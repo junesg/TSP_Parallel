@@ -7,7 +7,9 @@
 #include <set>
 #include <math.h>
 
-#define MAXDEPTH 100;
+#define MAXDEPTH 100
+#define MAXITER 1000
+
 using namespace std;
 
 doublylinkedlist ImprovePath(doublylinkedlist P, int depth, set<int>*);
@@ -26,6 +28,34 @@ float distanceBetweenNodes(node* n1, node* n2){
 
 
 
+void TSP_LK (doublylinkedlist tour) {
+    int iter = 0;
+    while (iter < MAXITER) {
+        //construct the path
+        doublylinked path = copyList(tour,0,tour.countNodes()-1);
+        p = path.head;
+        //select the starting node of the edge
+        for (int i=0; i<iter; i++) {
+            p = p-> next;
+        }
+        //create the path
+        path.start =p->next;
+        path.end = p;
+        path.start -> prev = NULL:
+        path.end -> next = NULL;
+        //improve the path
+        set<int> R;
+        doublylinkedlist tour2 = improvePath(path,1,R);
+        if (tour2.getDistance() < tour.getDistance) {
+            tour.destroy();
+            tour.~doublylinkedlist();
+            tour = improveTour(tour2);
+            tour.rearrangeList();
+            iter = 0;
+        }
+        else iter =iter+1;
+    }
+}
 
 
 /*

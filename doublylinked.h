@@ -84,7 +84,7 @@ void doublylinkedlist::createList(int* ind, int* x, int* y, int n)
 }
 
 
-
+//This function is a self-destruction function of the inner contents of the doublylinkedlist
 void doublylinkedlist::destroy(){
     node *p, *q;
     p = head;
@@ -94,6 +94,8 @@ void doublylinkedlist::destroy(){
         delete q;
     }
     delete p;
+    head= NULL;
+    end = NULL;
 }
 
 
@@ -488,6 +490,9 @@ void doublylinkedlist::extractIndices(int* arr){
         count ++;
     }
 }
+
+
+
 
 //append list L2 to this function
  
