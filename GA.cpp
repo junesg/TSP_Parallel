@@ -10,7 +10,7 @@
 #include "doublylinked.h"
 //#endif
 
-#define CROSSK 0.30
+#define CROSSK 0.40
 #define POPULATION 5;
 #define breedPop 30;
 #define mutation_perc 10;
@@ -24,7 +24,7 @@ doublylinkedlist<int> GenerateOneSpecies(std::vector<pair<int,int> > coordinates
 vector<doublylinkedlist<int> >  GenerateInitPopulation(std::vector <pair<int,int> > coordinates);
 void sortPopDistance(vector< doublylinkedlist<int> >  *list, vector<float> *distances, int left, int right);
 int myrandom (int i);
-
+doublylinkedlist<int> crossOver2(doublylinkedlist<int> p1,doublylinkedlist<int> p2);
 
 
 //Overal GA function
@@ -41,19 +41,19 @@ int main(){
 	//now generate a distance matrix
 	vector<float> distances;
 	for (vector<doublylinkedlist<int> >::iterator it=group.begin(); it!= group.end(); it++) {
-		(*it).displayforward();	
-		cout<<endl;
-		cout<<(*it).getDistance()<<endl;
+//		(*it).displayforward();
+//		cout<<endl;
+//		cout<<(*it).getDistance()<<endl;
 		distances.push_back((*it).getDistance());
 	}	
 	
 	sortPopDistance(&group, &distances,0,n);
 
-    for (vector<doublylinkedlist<int> >::iterator it=group.begin(); it!= group.end(); it++) {
-        (*it).displayforward();
-        cout<<endl;
-    }
-    
+//    for (vector<doublylinkedlist<int> >::iterator it=group.begin(); it!= group.end(); it++) {
+// //       (*it).displayforward();
+// //       cout<<endl;
+//    }
+//    
     
     //combine for breeding ##############3
     //NEED TO DO: to select a pair randomly from the population.
@@ -65,13 +65,18 @@ int main(){
     cout<< " and ";
     group.at(1).displayforward();
     cout<<endl;
-    newlist = crossOver1(group.at(0) , group.at(1));
-    newlist.displayforward();
+    
+//    
+//    group.at(0).deleteNode(3);
+//    group.at(0).displayforward();
+//    
+    newlist = crossOver2(group.at(0) , group.at(1));
+   // newlist.displayforward();
     
     //Now mutation.
     //do a random flipping of nodes
     //using the flipping funcion
-    //Random generate 2 numbers, and flips them 
+    //Random generate 2 numbers, and flips them
 
 
 
@@ -91,6 +96,7 @@ int main(){
 
 
 
+//ordercross over, from Davis 85, Oliver,Smith and Holland (1987) sited in Heinrich Braun(1990) as algorithm1
 doublylinkedlist<int> crossOver1(doublylinkedlist<int> p1,doublylinkedlist<int> p2){
 	
     int length = p1.countNodes();
@@ -102,11 +108,9 @@ doublylinkedlist<int> crossOver1(doublylinkedlist<int> p1,doublylinkedlist<int> 
     doublylinkedlist<int> t1 = p1.copyList(0,breakPt);
     doublylinkedlist<int> t2 = p2.copyList(0, length-1);
     
-    //cout<<"DEBUG1: "; t1.displayforward();
-   // cout<<"DEBUG2: "; t2.displayforward();
 
     int indices[breakPt+1];
-    int content[3];
+    //int content[3];
     t1.extractIndices(indices);
    // cout<<"count node: "<<breakPt+1<<" is the same as "<<t1.countNodes()<<endl;
     //before dlete
@@ -127,28 +131,12 @@ doublylinkedlist<int> crossOver1(doublylinkedlist<int> p1,doublylinkedlist<int> 
     t1.displayforward();
     cout<<endl;
 
+    t2.destroy();
     return t1;
 }
 
 
 
-
-
-
-
-/*
-;<int> crossOver2(doublylinkedlist<int> p1,doublylinkedlist<int> p2){
-    
-    
-    
-    
-
-    
-    
-    
-    
-}
-*/
 
 //Genetic Algorithm
 
