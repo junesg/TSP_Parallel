@@ -80,8 +80,8 @@ doublylinkedlist TSP_LK (doublylinkedlist thisTour, int MAXITER) {
         }
 
         cout<<"TSP_LK destroy  path"<<endl;
-        path.destroy();
-        path.~doublylinkedlist(); //destroy the current path##2
+       // path.destroy();
+       // path.~doublylinkedlist(); //destroy the current path##2
         R.~vector();
     }
     cout<<"TSP_LK destroy original path"<<endl;
