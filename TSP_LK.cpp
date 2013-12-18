@@ -75,7 +75,7 @@ doublylinkedlist TSP_LK (doublylinkedlist thisTour, int MAXITER) {
         }
        else {
            iter =iter+1;
-           //tour2.destroy();
+           tour2.destroy();
            tour2.~doublylinkedlist(); //destorys the tour2##3
         }
 

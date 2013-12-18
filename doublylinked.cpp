@@ -131,11 +131,11 @@ void doublylinkedlist::destroy(){
             cout<<"Deleting data: "<<p->data<<endl;
             //delete p;
             node* q = p->next;
-            //free(p);
+            free(p);
             delete(p);
             p = q;
         }
-        delete(p);
+        free(p);delete(p);
     }
     cout<<"finished"<<endl;
 
@@ -148,11 +148,12 @@ doublylinkedlist::~doublylinkedlist(){
             printf("deleting %d , %f, %f\n",current->data,current->x, current->y);
             node* next = current->next;
             free(current);
-            // delete current;
+            delete current;
             current = next;
         }
         printf("deleting %d , %f, %f\n",current->data,current->x, current->y);
         free(current);
+        delete(current);
         cout<<"finished"<<endl;
     }
 }
