@@ -126,27 +126,35 @@ void doublylinkedlist::createList(int ind[], int xPos[], int yPos[], int n)
 void doublylinkedlist::destroy(){
     node *p;
     if (head != NULL) {
-       p = head;
-        while( p != NULL) {
-            cout<<"Deleting data: "<<q->data<<endl;
+       p = head->next;
+        while( p != head) {
+            cout<<"Deleting data: "<<p->data<<endl;
             //delete p;
             node* q = p->next;
-            free(p);
+            //free(p);
             delete(p);
-            p =q;
+            p = q;
         }
+        delete(p);
     }
+    cout<<"finished"<<endl;
+
 }
 
 doublylinkedlist::~doublylinkedlist(){
-    node* current = head;
-    while( current != 0 ) {
-        cout<<"deleting2"<<endl;
-        node* next = current->next;
-        delete current;
-        current = next;
+    node* current = head->next;
+    if (head!=NULL) {
+        while( current != head ) {
+            printf("deleting %d , %f, %f\n",current->data,current->x, current->y);
+            node* next = current->next;
+            free(current);
+            // delete current;
+            current = next;
+        }
+        printf("deleting %d , %f, %f\n",current->data,current->x, current->y);
+        free(current);
+        cout<<"finished"<<endl;
     }
-    head = 0;
 }
 
 void doublylinkedlist::rearrangeList(int start){

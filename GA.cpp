@@ -15,7 +15,7 @@
 	//criterial for population  <= all combinations (n-1)!
 #define breedPop 8 //the size of the breeding population
 #define MUTATION 3 //how many links we mutate
-//#define LISTSIZE 10 //size of the list --> will be replaced in the future by automatic size detection
+#define LISTSIZE 10 //size of the list --> will be replaced in the future by automatic size detection
 
 
 
@@ -156,8 +156,8 @@ void PopulationBreeding(std::vector<doublylinkedlist>* group, double fitDistance
 
 doublylinkedlist mutate(doublylinkedlist *aList) {
 	//first define number of iterations for twoopt
-	//return TwoOpt(*aList,MUTATION);
-	return TSP_LK(*aList, MUTATION);
+	return TwoOpt(*aList,MUTATION);
+	//return TSP_LK(*aList, MUTATION);
 }
 
 
