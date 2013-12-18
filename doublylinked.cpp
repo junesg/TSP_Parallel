@@ -109,7 +109,7 @@ void doublylinkedlist::createList(int ind[], int xPos[], int yPos[], int n)
     
 	for (int i=1; i<n; i++){
 		q = p;
-		p = (node*)malloc(sizeof(node));
+		p = new node;
         q->next = p;
 		p->data = ind[i];
         p->x = xPos[i];
