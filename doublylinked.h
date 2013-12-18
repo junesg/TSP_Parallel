@@ -15,6 +15,7 @@ struct node {   //node struct, has data in it and has pointers to previous and n
     float y;
     node *prev;
     node *next;
+    node(int data1, float x1, float y1): data(data1),x(x1), y(y1){}
 };
 
 class doublylinkedlist
@@ -29,9 +30,7 @@ public:
     }
     
    	void createList(int*,int*,int*,int);
-    void destroy();
     ~doublylinkedlist();
-    doublylinkedlist removeParts(doublylinkedlist t1, doublylinkedlist p2);
 	void insertAfter(int,int, int, int);
 	void displayforward();
 	void displaybackward();
@@ -50,7 +49,8 @@ public:
 	bool compareList(doublylinkedlist);
 };
 
-
+//copyList is the only function that dynamically allocates
+//memory
 doublylinkedlist copyList(doublylinkedlist P, int start, int end);
 
 #endif

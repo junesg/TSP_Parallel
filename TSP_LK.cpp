@@ -12,8 +12,6 @@ using namespace std;
 
 
 
-
-
 int main() {
     doublylinkedlist aList;
     int ind[LISTSIZE] = {0, 1, 2, 3, 4, 5,6,7,8,9};
@@ -23,16 +21,17 @@ int main() {
     aList.displayforward();
     cout<<endl;
     cout<<"original distance is "<<aList.getDistance()<<endl;
-
-    aList = TSP_LK(aList,5);
+    
+    doublylinkedlist* blist;
+    *blist = TSP_LK(aList,5);
+    aList.~doublylinkedlist();
     
     cout<<endl<<"final reslult"<<endl;
-    aList.displayforward();
+    blist->displayforward();
     printf("debug");
 
-    cout<<"distance is "<<aList.getDistance()<<endl;
-    aList.destroy();
-    aList.~doublylinkedlist();
+    cout<<"distance is "<<blist->getDistance()<<endl;
+    blist->doublylinkedlist::~doublylinkedlist();
 }
 
 
@@ -67,25 +66,21 @@ doublylinkedlist TSP_LK (doublylinkedlist thisTour, int MAXITER) {
         //path is also destroyed ##2
         
         if (tour2.getDistance() < tour.getDistance()) {
-           tour.destroy();
            tour.~doublylinkedlist(); //destroys the tour##1
            tour = tour2; //tour now points to tour2
            iter = 0;
         }
        else {
            iter =iter+1;
-           tour2.destroy();
            tour2.~doublylinkedlist(); //destorys the tour2##3
         }
 
       //  cout<<"TSP_LK destroy  path"<<endl;
-       // path.destroy();
        // path.~doublylinkedlist(); //destroy the current path##2
        // cout<<"destroy vector"<<enl;
        // R.~vector();
     }
     cout<<"TSP_LK destroy original path"<<endl;
-    thisTour.destroy();
     thisTour.~doublylinkedlist();
     return tour;
 }
@@ -118,10 +113,8 @@ doublylinkedlist ImprovePath(doublylinkedlist thisPath, int depth, vector<int> *
                         tour.flipTwoItems(p->data, path.end->data);                     //flip the two items in tour
                         tour.end = tour.head -> prev;
                         cout<<"IM: destroy original path: path in first if"<<endl;
-                        path.destroy();
                         path.~doublylinkedlist(); //destroy path ##1'
                         cout<<"IM: destroy original path: thisPath in first if"<<endl;
-                        thisPath.destroy();
                         thisPath.~doublylinkedlist();//destroy original path
                         return tour; //return the path ##2
                     }
@@ -131,7 +124,6 @@ doublylinkedlist ImprovePath(doublylinkedlist thisPath, int depth, vector<int> *
                         (*R)[thisData]=1;
                         cout<<"IM: destroy original path: thisPath in first else"<<endl;
 
-                        thisPath.destroy();
                         thisPath.~doublylinkedlist();
                         return ImprovePath(path, depth+1, R); //return improvement of ##1
                     }
@@ -167,13 +159,12 @@ doublylinkedlist ImprovePath(doublylinkedlist thisPath, int depth, vector<int> *
                 path.end = path.head -> prev;
                 tour.flipTwoItems(maxNode->data,path.end->data);
                 cout<<"IM: destroy original path: path in second if"<<endl;
-                path.destroy(); thisPath.destroy();
                 path.~doublylinkedlist(); thisPath.~doublylinkedlist(); //destroy ##1 and the original thisPath
                 return tour;
             }
         }
         else{
-            thisPath.destroy(); thisPath.~doublylinkedlist(); //destroy original thisPath
+            thisPath.~doublylinkedlist(); //destroy original thisPath
             }
     }
     return path;
@@ -319,7 +310,6 @@ doublylinkedlist rayOpt(doublylinkedlist P,int NUMITERATIONS) //number of iterat
                 tempList.displayforward();cout<<endl;
                // tempList.end = tempList.head -> prev;
                 P.displayforward(); cout<<endl;
-                P.destroy();
                 P.~doublylinkedlist();
                 P = copyList(tempList,0,num_nodes-1);
                 cout<<"DIsplay templist: "<<endl;
@@ -435,14 +425,12 @@ doublylinkedlist starOpt(doublylinkedlist P, int K,int NUMITERATIONS)
             if (current_distance<best_distance) {
                 best_distance = current_distance;
                 printf("BEST = %f\n",best_distance);
-                P.destroy();
                 P.~doublylinkedlist();
                 cout<<"COPY IN DEBUG: "<<num_nodes<<" nodes"<<endl;
                 tempList.displayforward();cout<<endl<<endl;
                 P = copyList(tempList,0,num_nodes-1);
                 n = 0;
             }
-            tempList.destroy();
             tempList.~doublylinkedlist();
         }
     }
@@ -517,7 +505,6 @@ doublylinkedlist TwoOpt(doublylinkedlist P, int NUMITERATIONS)
                 tempList.displayforward();cout<<endl;
                 // tempList.end = tempList.head -> prev;
                 P.displayforward(); cout<<endl;
-                P.destroy();
                 P.~doublylinkedlist();
                 P = copyList(tempList,0,num_nodes-1);
                 cout<<"DIsplay templist: "<<endl;

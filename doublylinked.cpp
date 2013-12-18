@@ -45,14 +45,13 @@ int main(){
  */
 doublylinkedlist copyList(doublylinkedlist P, int start, int end)
 {
-    cout<<"Start COPYLIST: "<<endl;
-	doublylinkedlist copied;
-    
+    doublylinkedlist copied;
+    cout<<"Start COPYLIST"<<endl;
 	if (start > end) { //start has to come before end
-		return copied;
+		return copied; //return empty list
     }
     if (start < 0 || end > P.countNodes()) //check bounds of start and end
-		return copied;
+		return copied; //return empty list
     
 	int count = end-start +1; //number of nodes to be added
 
@@ -81,9 +80,8 @@ doublylinkedlist copyList(doublylinkedlist P, int start, int end)
 		arr[iter] = (p->data);
 		xPos[iter] = ((int) p->x);
 		yPos[iter]=((int) p->y);
-	
 	copied.createList(arr,xPos,yPos,count);
-    cout<<"getting out of COPYLIST: "<<endl;
+    cout<<"getting out of COPYLIST"<<endl;
 	return copied;
 }
 
@@ -99,21 +97,22 @@ void doublylinkedlist::createList(int ind[], int xPos[], int yPos[], int n)
 {
 
 	node *q;  //just a pointer
-	node *p = (node*)malloc(sizeof(node)); //the first node
-	p->data = ind[0];
-    p->x = xPos[0];
-    p->y = yPos[0];
+	//node *p = (node*)malloc(sizeof(node)); //the first node
+    node *p = new node(ind[0],(float)xPos[0],(float)yPos[0]);
+	//p->data = ind[0];
+    //p->x = xPos[0];
+    //p->y = yPos[0];
 	head = p;
 	p-> next = NULL;
 	p-> prev = NULL;
     
 	for (int i=1; i<n; i++){
 		q = p;
-		p = new node;
+		p = new node(ind[i], (float)(xPos[i]),(float)(yPos[i]));
         q->next = p;
-		p->data = ind[i];
-        p->x = xPos[i];
-        p->y = yPos[i];
+		//p->data = ind[i];
+        //p->x = xPos[i];
+        //p->y = yPos[i];
 		p->next = NULL;
 		p->prev = q;
 	}
@@ -122,26 +121,6 @@ void doublylinkedlist::createList(int ind[], int xPos[], int yPos[], int n)
     head -> prev = end;
 }
 
-//This function is a self-destruction function of the inner contents of the doublylinkedlist
-void doublylinkedlist::destroy(){
-    /*
-    node *p;
-    if (head != NULL) {
-       p = head->next;
-        while( p != head) {
-            cout<<"Deleting data: "<<p->data<<endl;
-            //delete p;
-            node* q = p->next;
-            //free(p);
-            free(p);
-            p = q;
-        }
-        free(p);
-    }
-    cout<<" destroy finished"<<endl;
-     */
-
-}
 
 doublylinkedlist::~doublylinkedlist(){
     node* current = head->next;
@@ -149,7 +128,7 @@ doublylinkedlist::~doublylinkedlist(){
         while( current != head ) {
             printf("deleting %d , %f, %f\n",current->data,current->x, current->y);
             node* next = current->next;
-            free(current);
+            delete current;
             // delete current;
             current = next;
         }
@@ -247,10 +226,10 @@ void doublylinkedlist::insertAfter(int item, int x, int y, int key) {
 		return;
 	}
     
-	node *p=new node;
-	p->data=item;
-    p->x=x;
-    p->y=y;
+	node *p=new node(item, (float)x, (float)y);
+//	p->data=item;
+//    p->x=x;
+//    p->y=y;
 	p->next=q->next;
 	p->prev=q;
 	q->next=p;
