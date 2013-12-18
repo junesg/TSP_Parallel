@@ -30,7 +30,7 @@ public:
     
    	void createList(int*,int*,int*,int);
     void destroy();
-    ~doublylinkedlist(){};
+    ~doublylinkedlist();
     doublylinkedlist removeParts(doublylinkedlist t1, doublylinkedlist p2);
 	void insertAfter(int,int, int, int);
 	void displayforward();

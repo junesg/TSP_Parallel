@@ -124,21 +124,15 @@ void doublylinkedlist::createList(int ind[], int xPos[], int yPos[], int n)
 
 //This function is a self-destruction function of the inner contents of the doublylinkedlist
 void doublylinkedlist::destroy(){
-    node *p, *q;
+    node *p;
     if (head != NULL) {
-        q = head;
-        p = head -> next;
-        while( p != head->prev) {
+       p = head;
+        while( p != NULL) {
             //cout<<"Deleting data: "<<q->data<<endl;
-            free(q);
-            q = p;
-            // delete q;
+            delete p;
+            free(p);
             p = p->next;
         }
-     //   cout<<"Deleting data: "<<q->data<<endl;
-        free(q);
-    //    cout<<"Deleting data: "<<p->data<<endl;
-        free(p);
     }
 }
 
