@@ -16,7 +16,7 @@ float distanceBetweenNodes(node* n1, node* n2);
 doublylinkedlist copyList(doublylinkedlist P, int start, int end);
 doublylinkedlist rayOpt(doublylinkedlist P,int);
 doublylinkedlist starOpt(doublylinkedlist P, int K,int);
-doublylinkedlist TSP_LK (doublylinkedlist tour,int) ;
+doublylinkedlist* TSP_LK (doublylinkedlist tour,int) ;
 doublylinkedlist TwoOpt(doublylinkedlist,int );
 
 #endif

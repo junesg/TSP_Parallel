@@ -23,7 +23,7 @@ int main() {
     cout<<"original distance is "<<aList.getDistance()<<endl;
     
     doublylinkedlist* blist;
-    *blist = TSP_LK(aList,5);
+    blist = TSP_LK(aList,5);
     aList.~doublylinkedlist();
     
     cout<<endl<<"final reslult"<<endl;
@@ -42,19 +42,21 @@ float distanceBetweenNodes(node* n1, node* n2){
 
 
 
-doublylinkedlist TSP_LK (doublylinkedlist thisTour, int MAXITER) {
+doublylinkedlist* TSP_LK (doublylinkedlist thisTour, int MAXITER) {
     int iter = 0;
     int countNode = thisTour.countNodes();
-    doublylinkedlist tour = copyList(thisTour, 0 , countNode-1);//created tour##1
+    doublylinkedlist *tour;
+    *tour = copyList(thisTour, 0 , countNode-1);//created tour##1 pointer
     
     while (iter < MAXITER) {
-        doublylinkedlist path = copyList(tour,0,countNode-1);//construct the path##2
-        node* p = path.head;
+        doublylinkedlist *path; *path = copyList(*tour,0,countNode-1);//construct the path##2
+        node* p = path->head;
         for (int i=0; i<iter; i++ ){
             p=p->next;
         }
         //rearrange to form a path
-        path.rearrangeList(p->data);
+        path->rearrangeList(p->data);
+        cout<<"REARRANGE"<<endl;
         //now call improve path on this path
         vector<int> R;
         for (int i=0; i<countNode; i++) {
@@ -62,23 +64,18 @@ doublylinkedlist TSP_LK (doublylinkedlist thisTour, int MAXITER) {
         }
         
         //construct the improved path ##
-        doublylinkedlist tour2 = ImprovePath(path, 1, &R); //construct the path##3
+        doublylinkedlist *tour2; *tour2 = ImprovePath(*path, 1, &R); //construct the path##3
         //path is also destroyed ##2
         
-        if (tour2.getDistance() < tour.getDistance()) {
-           tour.~doublylinkedlist(); //destroys the tour##1
+        if (tour2->getDistance() < tour->getDistance()) {
+           tour->doublylinkedlist::~doublylinkedlist(); //destroys the tour##1
            tour = tour2; //tour now points to tour2
            iter = 0;
         }
        else {
            iter =iter+1;
-           tour2.~doublylinkedlist(); //destorys the tour2##3
+           tour2->doublylinkedlist::~doublylinkedlist(); //destorys the tour2##3
         }
-
-      //  cout<<"TSP_LK destroy  path"<<endl;
-       // path.~doublylinkedlist(); //destroy the current path##2
-       // cout<<"destroy vector"<<enl;
-       // R.~vector();
     }
     cout<<"TSP_LK destroy original path"<<endl;
     thisTour.~doublylinkedlist();
