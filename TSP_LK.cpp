@@ -36,7 +36,7 @@ int main() {
     cout<<endl;
     cout<<"original distance is "<<aList.getDistance()<<endl;
 
-   // aList = TSP_LK(aList,5);
+    aList = TSP_LK(aList,5);
     
     cout<<endl<<"final reslult"<<endl;
     aList.displayforward();
