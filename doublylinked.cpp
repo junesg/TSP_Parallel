@@ -129,8 +129,9 @@ void doublylinkedlist::destroy(){
        p = head;
         while( p != NULL) {
             //cout<<"Deleting data: "<<q->data<<endl;
-            delete p;
+            //delete p;
             free(p);
+            delete(p);
             p = p->next;
         }
     }
