@@ -53,15 +53,7 @@ float distanceBetweenNodes(node* n1, node* n2){
     return sqrt(pow((n1->x - n2->x),2) +pow((n1->y - n2->y),2));
 }
 
-doublylinkedlist::~doublylinkedlist(){
-    node* current = head;
-    while( current != 0 ) {
-        node* next = current->next;
-        delete current;
-        current = next;
-    }
-    head = 0;
-}
+
 
 doublylinkedlist TSP_LK (doublylinkedlist thisTour, int MAXITER) {
     int iter = 0;
@@ -95,7 +87,7 @@ doublylinkedlist TSP_LK (doublylinkedlist thisTour, int MAXITER) {
         }
        else {
            iter =iter+1;
-           tour2.destroy();
+           //tour2.destroy();
            tour2.~doublylinkedlist(); //destorys the tour2##3
         }
 

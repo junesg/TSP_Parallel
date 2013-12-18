@@ -136,6 +136,16 @@ void doublylinkedlist::destroy(){
     }
 }
 
+doublylinkedlist::~doublylinkedlist(){
+    node* current = head;
+    while( current != 0 ) {
+        node* next = current->next;
+        delete current;
+        current = next;
+    }
+    head = 0;
+}
+
 void doublylinkedlist::rearrangeList(int start){
 	//Now loop through to make sure head is always the 0_th item
 	node* p=head;
