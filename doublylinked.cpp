@@ -147,12 +147,10 @@ doublylinkedlist::~doublylinkedlist(){
         while( current != head ) {
             printf("deleting %d , %f, %f\n",current->data,current->x, current->y);
             node* next = current->next;
-            free(current);
             delete current;
             current = next;
         }
         printf("deleting %d , %f, %f\n",current->data,current->x, current->y);
-        free(current);
         delete(current);
         cout<<"finished"<<endl;
     }
