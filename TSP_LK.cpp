@@ -47,10 +47,9 @@ doublylinkedlist TSP_LK (doublylinkedlist thisTour, int MAXITER) {
     int iter = 0;
     int countNode = thisTour.countNodes();
     doublylinkedlist tour = copyList(thisTour, 0 , countNode-1);//created tour##1
-    doublylinkedlist path;
     
     while (iter < MAXITER) {
-        path = copyList(tour,0,countNode-1);//construct the path##2
+        doublylinkedlist path = copyList(tour,0,countNode-1);//construct the path##2
         node* p = path.head;
         for (int i=0; i<iter; i++ ){
             p=p->next;
@@ -79,10 +78,11 @@ doublylinkedlist TSP_LK (doublylinkedlist thisTour, int MAXITER) {
            tour2.~doublylinkedlist(); //destorys the tour2##3
         }
 
-        cout<<"TSP_LK destroy  path"<<endl;
+      //  cout<<"TSP_LK destroy  path"<<endl;
        // path.destroy();
        // path.~doublylinkedlist(); //destroy the current path##2
-        R.~vector();
+       // cout<<"destroy vector"<<enl;
+       // R.~vector();
     }
     cout<<"TSP_LK destroy original path"<<endl;
     thisTour.destroy();
