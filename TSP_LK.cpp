@@ -79,8 +79,8 @@ doublylinkedlist TSP_LK (doublylinkedlist thisTour, int MAXITER) {
            tour2.~doublylinkedlist(); //destorys the tour2##3
         }
 
-      //  path.destroy();
-    // path.~doublylinkedlist(); //destroy the current path##2
+        path.destroy();
+        path.~doublylinkedlist(); //destroy the current path##2
         R.~vector();
     }
     return tour;
