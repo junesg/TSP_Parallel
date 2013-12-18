@@ -43,7 +43,7 @@ int main(){
  *for example to copy from 0 to num_nodes-1, start = 0, num_nodes-1=end
  *returns a different doublylinkedlist
  */
-doublylinkedlist copyList(doublylinkedlist P, int start, int end)
+doublylinkedlist* copyList(doublylinkedlist P, int start, int end)
 {
     doublylinkedlist copied;
     cout<<"Start COPYLIST"<<endl;
@@ -82,7 +82,7 @@ doublylinkedlist copyList(doublylinkedlist P, int start, int end)
 		yPos[iter]=((int) p->y);
 	copied.createList(arr,xPos,yPos,count);
     cout<<"getting out of COPYLIST"<<endl;
-	return copied;
+	return &copied;
 }
 
 
@@ -126,13 +126,11 @@ doublylinkedlist::~doublylinkedlist(){
     node* current = head->next;
     if (head!=NULL) {
         while( current != head ) {
-            printf("deleting %d , %f, %f\n",current->data,current->x, current->y);
             node* next = current->next;
             delete current;
             // delete current;
             current = next;
         }
-        printf("deleting %d , %f, %f\n",current->data,current->x, current->y);
         free(current);
         cout<<"finished"<<endl;
     }

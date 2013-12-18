@@ -13,7 +13,7 @@ using namespace std;
 doublylinkedlist ImprovePath(doublylinkedlist P, int depth, vector<int> *R);
 float distanceBetweenNodes(node* n1, node* n2);
 //methods in the doublylinked.cpp file
-doublylinkedlist copyList(doublylinkedlist P, int start, int end);
+doublylinkedlist* copyList(doublylinkedlist P, int start, int end);
 doublylinkedlist rayOpt(doublylinkedlist P,int);
 doublylinkedlist starOpt(doublylinkedlist P, int K,int);
 doublylinkedlist* TSP_LK (doublylinkedlist tour,int) ;
