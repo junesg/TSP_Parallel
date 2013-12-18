@@ -128,11 +128,12 @@ void doublylinkedlist::destroy(){
     if (head != NULL) {
        p = head;
         while( p != NULL) {
-            //cout<<"Deleting data: "<<q->data<<endl;
+            cout<<"Deleting data: "<<q->data<<endl;
             //delete p;
+            node* q = p->next;
             free(p);
             delete(p);
-            p = p->next;
+            p =q;
         }
     }
 }
@@ -140,6 +141,7 @@ void doublylinkedlist::destroy(){
 doublylinkedlist::~doublylinkedlist(){
     node* current = head;
     while( current != 0 ) {
+        cout<<"deleting2"<<endl;
         node* next = current->next;
         delete current;
         current = next;
