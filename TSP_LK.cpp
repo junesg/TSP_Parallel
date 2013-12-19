@@ -74,18 +74,21 @@ doublylinkedlist* TSP_LK(doublylinkedlist* thisTour, int MAXITER) {
         }
         
         //construct the improved path ##
-        tour2 = ImprovePath(tour2, 1, &R);
+        doublylinkedlist *tour3 = ImprovePath(tour2, 1, &R);
         cout<<"DEBUG IN TSP_LK"<<endl;
-        tour2->displayforward();cout<<"$$$$$$$"<<endl;
+        tour3->displayforward();cout<<"$$$$$$$"<<endl;
         
-        if (tour2->getDistance() < tour->getDistance()) {
+        if (tour3->getDistance() < tour->getDistance()) {
            tour->doublylinkedlist::~doublylinkedlist(); //destroys the tour##1
-           tour = tour2; //tour now points to tour2
+           tour2->doublylinkedlist::~doublylinkedlist();
            iter = 0;
+           return tour3;
         }
        else {
            iter =iter+1;
            tour2->doublylinkedlist::~doublylinkedlist(); //destorys the tour2##3
+           tour3->doublylinkedlist::~doublylinkedlist(); //destroys the tour##1
+           return tour;
         }
        // path->doublylinkedlist::~doublylinkedlist(); //destroy path ##2
     }
@@ -104,7 +107,7 @@ doublylinkedlist* ImprovePath(doublylinkedlist* path, int depth, vector<int> *R)
 
     //if there is three nodes in the path, no need to improve
     if (path->countNodes() <=3) {
-        return path;
+        return copyList(path,0,path->countNodes() -1);
     }
     
     //if the depth is smaller than maxdepth, keeps on improving till a better path is found
@@ -150,7 +153,7 @@ doublylinkedlist* ImprovePath(doublylinkedlist* path, int depth, vector<int> *R)
         node* p;
         if (path->countNodes() <=3) {
             cout<<"No Need improve path"<<endl;
-            return path;
+            return copyList(path,0,path->countNodes() -1);
         }
         path->end = path->head->prev;
         
@@ -175,7 +178,8 @@ doublylinkedlist* ImprovePath(doublylinkedlist* path, int depth, vector<int> *R)
             }
         }
     }
-
+    cout<<"SHOULD NEVER PRINT THIS OUT: PATH"<<endl;
+    return path;
 }
 
 
