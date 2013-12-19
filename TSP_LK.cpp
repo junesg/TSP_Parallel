@@ -57,7 +57,8 @@ doublylinkedlist* TSP_LK(doublylinkedlist* thisTour, int MAXITER) {
     tour = copyList(thisTour, 0 , countNode-1);//created tour##1
     
     while (iter < MAXITER) {
-        doublylinkedlist *tour2;
+        doublylinkedlist* tour2;
+        tour2 = new doublylinkedlist();
         tour2 = copyList(tour,0,countNode-1);//construct the path##2
         node* p = tour2->head;
         for (int i=0; i<iter; i++ ){
@@ -74,7 +75,8 @@ doublylinkedlist* TSP_LK(doublylinkedlist* thisTour, int MAXITER) {
         
         //construct the improved path ##
         ImprovePath(tour2, 1, &R);
-        
+        cout<<"DEBUG IN TSP_LK"<<endl;
+        tour2->displayforward();cout<<"$$$$$$$"<<endl;
         
         if (tour2->getDistance() < tour->getDistance()) {
            tour->doublylinkedlist::~doublylinkedlist(); //destroys the tour##1
@@ -125,7 +127,11 @@ void ImprovePath(doublylinkedlist* path, int depth, vector<int> *R){
                         cout<<"IM: destroy original path: path in first if"<<endl;
                         path->doublylinkedlist::~doublylinkedlist();                     //destroy path ##0
                         cout<<"IM: destroy original path: thisPath in first if"<<endl;
-                        path = tour;                                   //return the path ##1
+                        path = tour;
+                        
+                        //return the path ##1
+                        cout<<"returning!"<<endl;
+                        path->displayforward();cout<<"%%%%%%%%%%"<<endl;
                         return;
                     }
                     else {
@@ -191,7 +197,8 @@ doublylinkedlist* rayOpt(doublylinkedlist* P,int NUMITERATIONS) //number of iter
     float current_distance = 0;
     float best_distance = P->getDistance();
     vector<vector<int> > pairs;
-    doublylinkedlist *tempList;
+    doublylinkedlist* tempList;
+    
     
     while (n < NUMITERATIONS && n < num_nodes*(num_nodes-3)/2) {
         // Get pairs
