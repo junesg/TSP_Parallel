@@ -43,20 +43,21 @@ int main(){
  *for example to copy from 0 to num_nodes-1, start = 0, num_nodes-1=end
  *returns a different doublylinkedlist
  */
-doublylinkedlist* copyList(doublylinkedlist P, int start, int end)
+doublylinkedlist* copyList(doublylinkedlist* P, int start, int end)
 {
-    doublylinkedlist copied;
+    doublylinkedlist* copied;
+    
     cout<<"Start COPYLIST"<<endl;
 	if (start > end) { //start has to come before end
 		return copied; //return empty list
     }
-    if (start < 0 || end > P.countNodes()) //check bounds of start and end
+    if (start < 0 || end > P->countNodes()) //check bounds of start and end
 		return copied; //return empty list
     
 	int count = end-start +1; //number of nodes to be added
 
 	node *pStart, *pEnd;
-	node* p = P.head;
+	node* p = P->head;
 
 	//int count = 0;
 	for(int icount = 0; icount <= end; icount ++) {
@@ -80,9 +81,9 @@ doublylinkedlist* copyList(doublylinkedlist P, int start, int end)
 		arr[iter] = (p->data);
 		xPos[iter] = ((int) p->x);
 		yPos[iter]=((int) p->y);
-	copied.createList(arr,xPos,yPos,count);
+	copied->createList(arr,xPos,yPos,count);
     cout<<"getting out of COPYLIST"<<endl;
-	return &copied;
+	return copied;
 }
 
 

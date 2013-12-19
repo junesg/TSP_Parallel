@@ -10,13 +10,12 @@
 
 using namespace std;
 
-doublylinkedlist ImprovePath(doublylinkedlist P, int depth, vector<int> *R);
+void ImprovePath(doublylinkedlist*, int , vector<int>*);
 float distanceBetweenNodes(node* n1, node* n2);
 //methods in the doublylinked.cpp file
-doublylinkedlist* copyList(doublylinkedlist P, int start, int end);
-doublylinkedlist rayOpt(doublylinkedlist P,int);
-doublylinkedlist starOpt(doublylinkedlist P, int K,int);
-doublylinkedlist* TSP_LK (doublylinkedlist tour,int) ;
-doublylinkedlist TwoOpt(doublylinkedlist,int );
+doublylinkedlist* rayOpt(doublylinkedlist* ,int);
+doublylinkedlist* starOpt(doublylinkedlist* , int ,int);
+doublylinkedlist* TSP_LK (doublylinkedlist* ,int) ;
+doublylinkedlist* TwoOpt(doublylinkedlist*,int );
 
 #endif

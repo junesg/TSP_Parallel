@@ -51,6 +51,6 @@ public:
 
 //copyList is the only function that dynamically allocates
 //memory
-doublylinkedlist* copyList(doublylinkedlist P, int start, int end);
+doublylinkedlist* copyList(doublylinkedlist* , int start, int end);
 
 #endif

@@ -13,25 +13,26 @@ using namespace std;
 
 
 int main() {
-    doublylinkedlist aList;
+    doublylinkedlist* aList;
     int ind[LISTSIZE] = {0, 1, 2, 3, 4, 5,6,7,8,9};
     int x[LISTSIZE]   = {0, 0, 1, 1, 2, 2,4,5,6,7};
     int y[LISTSIZE]   = {10,0, 10,0, 10, 0,2,3,4,5};
-    aList.createList(ind,x,y,LISTSIZE);
-    aList.displayforward();
+    aList->createList(ind,x,y,LISTSIZE);
+    aList->displayforward();
     cout<<endl;
-    cout<<"original distance is "<<aList.getDistance()<<endl;
+    cout<<"original distance is "<<aList->getDistance()<<endl;
     
-    doublylinkedlist* blist;
-    blist = TSP_LK(aList,5);
-    aList.~doublylinkedlist();
+    doublylinkedlist *bList;
+    bList = TSP_LK(aList,5);
     
     cout<<endl<<"final reslult"<<endl;
-    blist->displayforward();
+    bList->displayforward();
     printf("debug");
 
-    cout<<"distance is "<<blist->getDistance()<<endl;
-    blist->doublylinkedlist::~doublylinkedlist();
+    cout<<"distance is "<<bList->getDistance()<<endl;
+    aList->doublylinkedlist::~doublylinkedlist();
+    bList->doublylinkedlist::~doublylinkedlist();
+
 }
 
 
@@ -41,21 +42,26 @@ float distanceBetweenNodes(node* n1, node* n2){
 }
 
 
-
-doublylinkedlist* TSP_LK (doublylinkedlist thisTour, int MAXITER) {
+/*
+ *TSP_LK takes in a pointer to the class of doublylinkedlist, which is the tour,
+ *it returns a pointer to a new dynamically allocated doublylinkedlist
+ *MAXITER is the number of iterations that the program iterates through
+ */
+doublylinkedlist* TSP_LK(doublylinkedlist* thisTour, int MAXITER) {
     int iter = 0;
-    int countNode = thisTour.countNodes();
+    int countNode = thisTour->countNodes();
     doublylinkedlist *tour;
-    tour = copyList(thisTour, 0 , countNode-1);//created tour##1 pointer
+    tour = copyList(thisTour, 0 , countNode-1);//created tour##1
     
     while (iter < MAXITER) {
-        doublylinkedlist *path; path = copyList(*tour,0,countNode-1);//construct the path##2
-        node* p = path->head;
+        doublylinkedlist *tour2;
+        tour2 = copyList(tour,0,countNode-1);//construct the path##2
+        node* p = tour2->head;
         for (int i=0; i<iter; i++ ){
             p=p->next;
         }
         //rearrange to form a path
-        path->rearrangeList(p->data);
+        tour2->rearrangeList(p->data);
         cout<<"REARRANGE"<<endl;
         //now call improve path on this path
         vector<int> R;
@@ -64,8 +70,7 @@ doublylinkedlist* TSP_LK (doublylinkedlist thisTour, int MAXITER) {
         }
         
         //construct the improved path ##
-        doublylinkedlist *tour2;
-        tour2 = ImprovePath(*path, 1, &R); //construct the path##3
+        ImprovePath(tour2, 1, &R);
         
         
         if (tour2->getDistance() < tour->getDistance()) {
@@ -77,22 +82,24 @@ doublylinkedlist* TSP_LK (doublylinkedlist thisTour, int MAXITER) {
            iter =iter+1;
            tour2->doublylinkedlist::~doublylinkedlist(); //destorys the tour2##3
         }
+       // path->doublylinkedlist::~doublylinkedlist(); //destroy path ##2
     }
-    cout<<"TSP_LK destroy original path"<<endl;
-    path->doublylinkedlist::~doublylinkedlist(); //destroy path ##2
     return tour;
 }
 
-//doublylinkedlist that is put into the improve path "thisPath" will be destroyed;
-doublylinkedlist* ImprovePath(doublylinkedlist thisPath, int depth, vector<int> *R){
-    doublylinkedlist* path;
-    path = copyList(thisPath,0,thisPath.countNodes()-1); //create a new path inside this function ##1
+/*
+ *Improvepath takes in a pointer to a doublylinkedlist that is put into the improve path
+ *It outputs a pointer to the doublylinkedlist that is dynamically allocated
+ *depth is the number of iterations that a single path has been improved.
+ *R is a pointer to a vector that records which edges have been used R.at(edge-data)=1 or not used R.at(edge->data)=0
+ */
+void ImprovePath(doublylinkedlist* path, int depth, vector<int> *R){
    
     cout<<"Improving tour "; path->displayforward();cout<<endl;
-    
+
     //if there is three nodes in the path, no need to improve
     if (path->countNodes() <=3) {
-        return path;
+        return;
     }
     
     //if the depth is smaller than maxdepth, keeps on improving till a better path is found
@@ -108,32 +115,33 @@ doublylinkedlist* ImprovePath(doublylinkedlist thisPath, int depth, vector<int> 
                         distanceBetweenNodes(path->head, p->next)) {
                         //path.displayforward(); cout<<endl;
                         doublylinkedlist* tour;
-                        tour = copyList(*path, 0, path->countNodes()-1); //copy a new tour from path ##2
+                        tour = copyList(path, 0, path->countNodes()-1); //copy a new tour from path ##1
                         tour->flipTwoItems(p->data, path->end->data);  //flip the two items in tour
                         tour->end = tour->head->prev;
                         cout<<"IM: destroy original path: path in first if"<<endl;
-                        path->~doublylinkedlist();                     //destroy path ##1'
+                        path->doublylinkedlist::~doublylinkedlist();                     //destroy path ##0
                         cout<<"IM: destroy original path: thisPath in first if"<<endl;
-                        return tour;                                   //return the path ##2
+                        path = tour;                                   //return the path ##1
+                        return;
                     }
                     else {
                         path->flipTwoItems(p->data,path->end->data);  //just flip the edge
                         int thisData = p->data;
                         R->at(thisData)=1;
-                        return ImprovePath(path, depth+1, R); //return improvement of ##1
+                        ImprovePath(path, depth+1, R);
+                        return;  //return improvement of ##1
                     }
                 }
             }
         }
     }
-    
     else{
         float maxDist=0;
         node* maxNode;
         node* p;
         if (path->countNodes() <=3) {
             cout<<"No Need improve path"<<endl;
-            return path;
+            return;
         }
         path->end = path->head->prev;
         
@@ -149,89 +157,37 @@ doublylinkedlist* ImprovePath(doublylinkedlist thisPath, int depth, vector<int> 
                 distanceBetweenNodes(path->head,path->end) >
                 distanceBetweenNodes(maxNode, path->end) +
                 distanceBetweenNodes(path->head, maxNode->next)) {
-                doublylinkedlist *tour = copyList(*path, 0, path->countNodes()-1); //create tour from path ##2
+                doublylinkedlist *tour = copyList(path, 0, path->countNodes()-1); //create tour from path ##2
                 path->end = path->head -> prev;
                 tour->flipTwoItems(maxNode->data,path->end->data);
                 cout<<"IM: destroy original path: path in second if"<<endl;
                 path->doublylinkedlist::~doublylinkedlist(); //thisPath.~doublylinkedlist(); //destroy ##1 and the original thisPath
-                return tour;//return the path of ##2
+                path = tour;//return the path of ##2
             }
         }
         else{
             }
     }
-    return path;
-
+    return;
 }
 
-/*
-//copies the whole list from the "start" position to the "end" position
-doublylinkedlist copyList(doublylinkedlist P, int start, int end)
-{
-    cout<<"start from "<<start<<" end at "<<end<<endl;
-	doublylinkedlist copied;
-	if (start > end) {
-		return copied;
-    }
-	if (start < 0 || end > P.countNodes())
-		return copied;
-	node *pStart, *pEnd;
-	node* p = P.head;
-	
-	for(int count = 0; count <= end; count ++) {
-		if (count == start)
-			pStart = p;
-		if (count == end)
-			pEnd = p;
-		p = p-> next;
-	}
-    
-	vector<int> ind,x,y;
-	int count = 0;
-    
-	for(p = pStart; p!= pEnd; p = p-> next) {
-		//cout<<"data "<<p->data<<"("<<p->x<<","<<p->y<<")"<<endl;
-		ind.push_back((int) p->data);
-		x.push_back((int) p->x);
-		y.push_back((int) p->y);
-		count++;
-	}
-	
-    //cout<<"data "<<p->data<<"("<<p->x<<","<<p->y<<")"<<endl;
-    ind.push_back(p->data);
-    x.push_back(p->x);
-    y.push_back(p->y);
-    count++;
-    
-	int* arr = &ind[0];
-	int* xPos = &x[0];
-	int* yPos = &y[0];
-	//cout<<"array done! "<<endl;
-    
-    //	for(int i = 0; i < count; i++){
-    //		cout<<"arr: "<<arr[i]<< " xPos: "<<xPos[i]<<" yPos: "<<yPos[i]<<endl;
-    //	}
-	copied.createList(arr,xPos,yPos,count);
-	return copied;
-}
-*/
 
 
 //RayOpt takes in a list, ouputs swapped two nodes (4 edges, 2 adjacent pairs)
-doublylinkedlist rayOpt(doublylinkedlist P,int NUMITERATIONS) //number of iteration for two Opt)
+doublylinkedlist* rayOpt(doublylinkedlist* P,int NUMITERATIONS) //number of iteration for two Opt)
 {
     node *p, *p1, *p3, *temp0, *temp1, *temp2, *temp3;
-    int num_nodes = P.countNodes();
+    int num_nodes = P->countNodes();
     
   //  cout<<" P has number of nodes = "<<num_nodes<<endl;
-    P.displayforward(); cout<<endl;
+    P->displayforward(); cout<<endl;
     
     int flag,m,n = 0;
     int temp[4];
     float current_distance = 0;
-    float best_distance = P.getDistance();
+    float best_distance = P->getDistance();
     vector<vector<int> > pairs;
-    doublylinkedlist tempList;
+    doublylinkedlist *tempList;
     
     while (n < NUMITERATIONS && n < num_nodes*(num_nodes-3)/2) {
         // Get pairs
@@ -241,9 +197,9 @@ doublylinkedlist rayOpt(doublylinkedlist P,int NUMITERATIONS) //number of iterat
         cout<<"temp0 is "<<temp[0];
         cout<<"number of nodes: "<<num_nodes<<endl;
         
-        temp[1] = P.getNextIndex(temp[0]); //PROBLEM
+        temp[1] = P->getNextIndex(temp[0]); //PROBLEM
         temp[2] = rand() % num_nodes ;
-        temp[3] = P.getNextIndex(temp[2]);
+        temp[3] = P->getNextIndex(temp[2]);
         
         //check if the pair are adjacent or if the nodes are the same
         if (temp[0]==temp[2] || temp[0]==temp[3] || temp[1]==temp[2]) flag = 1;
@@ -262,17 +218,17 @@ doublylinkedlist rayOpt(doublylinkedlist P,int NUMITERATIONS) //number of iterat
             pairs[n][0] = temp[0];
             pairs[n][1] = temp[2];
             
-            tempList = copyList(P, 0, num_nodes-1);
+            tempList = copyList(P, 0, num_nodes-1); //create templist ##1
             
            // tempList.flipNodes(temp[1], temp[3]);
         
             
-            p = tempList.head;
+            p = tempList->head;
             while (1) {
                 if (p->data==temp[1]) p1 = p;
                 else if (p->data==temp[3]) p3 = p;
                 p=p->next;
-                if (p==tempList.head) break;
+                if (p==tempList->head) break;
             }
             
             temp0 = p1->prev;
@@ -289,10 +245,10 @@ doublylinkedlist rayOpt(doublylinkedlist P,int NUMITERATIONS) //number of iterat
             p3->next->prev = p1;
             p3->prev = temp0;
             p3->next = temp1;
-            tempList.end = tempList.head -> prev;
+            tempList->end = tempList->head -> prev;
             
-            current_distance = tempList.getDistance();
-            tempList.~doublylinkedlist();
+            current_distance = tempList->getDistance();
+            tempList->doublylinkedlist::~doublylinkedlist();
             
             printf("%d. Trying flip: (%d %d)(%d %d), distance = %f\n",n,temp[0],temp[1],temp[2],temp[3],current_distance);
             
@@ -300,10 +256,10 @@ doublylinkedlist rayOpt(doublylinkedlist P,int NUMITERATIONS) //number of iterat
                 best_distance = current_distance; // Update best distance
                 printf("BEST = %f\n",best_distance);
                 cout<<"DIsplay: "<<endl;
-                tempList.displayforward();cout<<endl;
+                tempList->displayforward();cout<<endl;
                // tempList.end = tempList.head -> prev;
-                P.displayforward(); cout<<endl;
-                P.~doublylinkedlist();
+                P->displayforward(); cout<<endl;
+                P->doublylinkedlist::~doublylinkedlist();
                 P = copyList(tempList,0,num_nodes-1);
                 cout<<"DIsplay templist: "<<endl;
                 //P.displayforward(); cout<<endl;
@@ -313,27 +269,27 @@ doublylinkedlist rayOpt(doublylinkedlist P,int NUMITERATIONS) //number of iterat
         }
     }
     printf("debugBEST = %f\n",best_distance);
-    P.end = P.head ->prev;
-    P.displayforward();
+    P->end = P->head ->prev;
+    P->displayforward();
     printf("\n");
     return P;
 }
 
 
-doublylinkedlist starOpt(doublylinkedlist P, int K,int NUMITERATIONS)
+doublylinkedlist* starOpt(doublylinkedlist* P, int K,int NUMITERATIONS)
 {
    // srand(3);
     node *p;
     node *root[K];
     node *temp_root[K];
-    int num_nodes = P.countNodes();
+    int num_nodes = P->countNodes();
     int i,k,m,n = 0;
     int temp[2*K];
     int flag,matches;
     float current_distance = 0; // starting distance
-    float best_distance = P.getDistance(); // starting best distance
+    float best_distance = P->getDistance(); // starting best distance
     vector < vector <int> > pairs;
-    doublylinkedlist tempList;
+    doublylinkedlist* tempList;
     
     while (n<NUMITERATIONS) {
         // Find K pairs
@@ -341,7 +297,7 @@ doublylinkedlist starOpt(doublylinkedlist P, int K,int NUMITERATIONS)
         while (k<K) {
             flag = 0;
             temp[2*k] = rand() % num_nodes;
-            temp[2*k+1] = P.getNextIndex(temp[2*k]);
+            temp[2*k+1] = P->getNextIndex(temp[2*k]);
            // cout<<"DEBUG: "<<temp[2*k]<<endl;
             
             for (i=0;i<k;i++) { // Make sure pairs have not been seen in current set
@@ -384,7 +340,7 @@ doublylinkedlist starOpt(doublylinkedlist P, int K,int NUMITERATIONS)
             tempList = copyList(P,0,num_nodes-1);
             
             // Flip K items
-            p = tempList.head;
+            p = tempList->head;
             i = 0;
             while (1) {
                 for (k=0;k<K;k++) {
@@ -396,7 +352,7 @@ doublylinkedlist starOpt(doublylinkedlist P, int K,int NUMITERATIONS)
                     }
                 }
                 p=p->next;
-                if (p==tempList.head) break;
+                if (p==tempList->head) break;
             }
             
             root[0]->next = temp_root[K-2];
@@ -407,10 +363,10 @@ doublylinkedlist starOpt(doublylinkedlist P, int K,int NUMITERATIONS)
                 root[k]->next->prev = root[k];
             }
             
-            tempList.end = tempList.head->prev;
+            tempList->end = tempList->head->prev;
             
             // Check distance
-            current_distance = tempList.getDistance();
+            current_distance = tempList->getDistance();
             printf("%d. Trying flip, distance = %f\n",n,current_distance);
             for (k=0;k<K;k++) printf("%d ",temp[2*k]);
             printf("\n");
@@ -418,17 +374,17 @@ doublylinkedlist starOpt(doublylinkedlist P, int K,int NUMITERATIONS)
             if (current_distance<best_distance) {
                 best_distance = current_distance;
                 printf("BEST = %f\n",best_distance);
-                P.~doublylinkedlist();
+                P->doublylinkedlist::~doublylinkedlist();
                 cout<<"COPY IN DEBUG: "<<num_nodes<<" nodes"<<endl;
-                tempList.displayforward();cout<<endl<<endl;
+                tempList->displayforward();cout<<endl<<endl;
                 P = copyList(tempList,0,num_nodes-1);
                 n = 0;
             }
-            tempList.~doublylinkedlist();
+            tempList->~doublylinkedlist();
         }
     }
     printf("BEST = %f\n",best_distance);
-    P.displayforward();
+    P->displayforward();
     printf("\n");
     return P;
 }
@@ -437,20 +393,20 @@ doublylinkedlist starOpt(doublylinkedlist P, int K,int NUMITERATIONS)
 
 
 //TwoOpt takes in a list, ouputs swapped two nodes (4 edges, 2 adjacent pairs)
-doublylinkedlist TwoOpt(doublylinkedlist P, int NUMITERATIONS)
+doublylinkedlist* TwoOpt(doublylinkedlist* P, int NUMITERATIONS)
 {
     //node *p, *p1, *p3, *temp0, *temp1, *temp2, *temp3;
-    int num_nodes = P.countNodes();
+    int num_nodes = P->countNodes();
     
     //  cout<<" P has number of nodes = "<<num_nodes<<endl;
-    P.displayforward(); cout<<endl;
+    P->displayforward(); cout<<endl;
     
     int flag,m,n = 0;
     int temp[4];
     float current_distance = 0;
-    float best_distance = P.getDistance();
+    float best_distance = P->getDistance();
     vector<vector<int> > pairs;
-    doublylinkedlist tempList;
+    doublylinkedlist* tempList;
     
     while (n < NUMITERATIONS && n < num_nodes*(num_nodes-3)/2) {
         // Get pairs
@@ -460,9 +416,9 @@ doublylinkedlist TwoOpt(doublylinkedlist P, int NUMITERATIONS)
         cout<<"temp0 is "<<temp[0];
         cout<<"number of nodes: "<<num_nodes<<endl;
         
-        temp[1] = P.getNextIndex(temp[0]); //PROBLEM
+        temp[1] = P->getNextIndex(temp[0]); //PROBLEM
         temp[2] = rand() % num_nodes ;
-        temp[3] = P.getNextIndex(temp[2]);
+        temp[3] = P->getNextIndex(temp[2]);
         
         //check if the pair are adjacent or if the nodes are the same
         if (temp[0]==temp[2] || temp[0]==temp[3] || temp[1]==temp[2]) flag = 1;
@@ -483,11 +439,11 @@ doublylinkedlist TwoOpt(doublylinkedlist P, int NUMITERATIONS)
             
             tempList = copyList(P, 0, num_nodes-1);
             
-            tempList.flipTwoItems(temp[0], temp[2]);
-            tempList.end = tempList.head -> prev;
+            tempList->flipTwoItems(temp[0], temp[2]);
+            tempList->end = tempList->head -> prev;
             
-            current_distance = tempList.getDistance();
-            tempList.~doublylinkedlist();
+            current_distance = tempList->getDistance();
+            tempList->~doublylinkedlist();
             
             printf("%d. Trying flip: (%d %d)(%d %d), distance = %f\n",n,temp[0],temp[1],temp[2],temp[3],current_distance);
             
@@ -495,10 +451,10 @@ doublylinkedlist TwoOpt(doublylinkedlist P, int NUMITERATIONS)
                 best_distance = current_distance; // Update best distance
                 printf("BEST = %f\n",best_distance);
                 cout<<"DIsplay: "<<endl;
-                tempList.displayforward();cout<<endl;
+                tempList->displayforward();cout<<endl;
                 // tempList.end = tempList.head -> prev;
-                P.displayforward(); cout<<endl;
-                P.~doublylinkedlist();
+                P->displayforward(); cout<<endl;
+                P->~doublylinkedlist();
                 P = copyList(tempList,0,num_nodes-1);
                 cout<<"DIsplay templist: "<<endl;
                 //P.displayforward(); cout<<endl;
@@ -508,8 +464,8 @@ doublylinkedlist TwoOpt(doublylinkedlist P, int NUMITERATIONS)
         }
     }
     printf("debugBEST = %f\n",best_distance);
-    P.end = P.head ->prev;
-    P.displayforward();
+    P->end = P->head ->prev;
+    P->displayforward();
     printf("\n");
     return P;
 }
