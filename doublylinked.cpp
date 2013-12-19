@@ -96,7 +96,6 @@ doublylinkedlist* copyList(doublylinkedlist* P, int start, int end)
  */
 void doublylinkedlist::createList(int ind[], int xPos[], int yPos[], int n)
 {
-
 	node *q;  //just a pointer
 	//node *p = (node*)malloc(sizeof(node)); //the first node
     node *p = new node(ind[0],(float)xPos[0],(float)yPos[0]);
@@ -132,7 +131,7 @@ doublylinkedlist::~doublylinkedlist(){
             // delete current;
             current = next;
         }
-        free(current);
+        delete(current);
         cout<<"finished"<<endl;
     }
 }
