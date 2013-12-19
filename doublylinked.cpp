@@ -46,6 +46,7 @@ int main(){
 doublylinkedlist* copyList(doublylinkedlist* P, int start, int end)
 {
     doublylinkedlist* copied;
+    copied = new doublylinkedlist();
     
     cout<<"Start COPYLIST"<<endl;
 	if (start > end) { //start has to come before end

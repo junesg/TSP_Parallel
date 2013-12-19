@@ -25,8 +25,8 @@ public:
     node *end;
     doublylinkedlist() //constructor
     {
-        head = NULL;
-        end = NULL;
+        node* head = NULL;
+        node* end = NULL;
     }
     
    	void createList(int*,int*,int*,int);

@@ -14,6 +14,7 @@ using namespace std;
 
 int main() {
     doublylinkedlist* aList;
+    aList = new doublylinkedlist();
     int ind[LISTSIZE] = {0, 1, 2, 3, 4, 5,6,7,8,9};
     int x[LISTSIZE]   = {0, 0, 1, 1, 2, 2,4,5,6,7};
     int y[LISTSIZE]   = {10,0, 10,0, 10, 0,2,3,4,5};
@@ -23,6 +24,7 @@ int main() {
     cout<<"original distance is "<<aList->getDistance()<<endl;
     
     doublylinkedlist *bList;
+    bList = new doublylinkedlist();
     bList = TSP_LK(aList,5);
     
     cout<<endl<<"final reslult"<<endl;
@@ -51,6 +53,7 @@ doublylinkedlist* TSP_LK(doublylinkedlist* thisTour, int MAXITER) {
     int iter = 0;
     int countNode = thisTour->countNodes();
     doublylinkedlist *tour;
+    tour =  new doublylinkedlist();
     tour = copyList(thisTour, 0 , countNode-1);//created tour##1
     
     while (iter < MAXITER) {
@@ -115,6 +118,7 @@ void ImprovePath(doublylinkedlist* path, int depth, vector<int> *R){
                         distanceBetweenNodes(path->head, p->next)) {
                         //path.displayforward(); cout<<endl;
                         doublylinkedlist* tour;
+                        tour = new doublylinkedlist();
                         tour = copyList(path, 0, path->countNodes()-1); //copy a new tour from path ##1
                         tour->flipTwoItems(p->data, path->end->data);  //flip the two items in tour
                         tour->end = tour->head->prev;
@@ -290,6 +294,7 @@ doublylinkedlist* starOpt(doublylinkedlist* P, int K,int NUMITERATIONS)
     float best_distance = P->getDistance(); // starting best distance
     vector < vector <int> > pairs;
     doublylinkedlist* tempList;
+    tempList= new doublylinkedlist();
     
     while (n<NUMITERATIONS) {
         // Find K pairs
@@ -407,6 +412,7 @@ doublylinkedlist* TwoOpt(doublylinkedlist* P, int NUMITERATIONS)
     float best_distance = P->getDistance();
     vector<vector<int> > pairs;
     doublylinkedlist* tempList;
+    tempList= new doublylinkedlist();
     
     while (n < NUMITERATIONS && n < num_nodes*(num_nodes-3)/2) {
         // Get pairs
