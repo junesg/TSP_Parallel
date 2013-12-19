@@ -101,8 +101,11 @@ doublylinkedlist* TSP_LK(doublylinkedlist* thisTour, int MAXITER) {
  *depth is the number of iterations that a single path has been improved.
  *R is a pointer to a vector that records which edges have been used R.at(edge-data)=1 or not used R.at(edge->data)=0
  */
-doublylinkedlist* ImprovePath(doublylinkedlist* path, int depth, vector<int> *R){
+doublylinkedlist* ImprovePath(doublylinkedlist* Thispath, int depth, vector<int> *R){
    
+    doublylinkedlist* path = new doublylinkedlist();
+    path = copyList(Thispath,0, Thispath->countNodes()-1);
+    
     cout<<"Improving tour "; path->displayforward();cout<<endl;
 
     //if there is three nodes in the path, no need to improve
@@ -141,7 +144,9 @@ doublylinkedlist* ImprovePath(doublylinkedlist* path, int depth, vector<int> *R)
                         path->flipTwoItems(p->data,path->end->data);  //just flip the edge
                         int thisData = p->data;
                         R->at(thisData)=1;
-                        return ImprovePath(path, depth+1, R);
+                        doublylinkedlist* result = ImprovePath(path, depth+1, R);
+                        path->~doublylinkedlist();
+                        return result;
                     }
                 }
             }
