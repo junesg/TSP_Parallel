@@ -74,7 +74,7 @@ doublylinkedlist* TSP_LK(doublylinkedlist* thisTour, int MAXITER) {
         }
         
         //construct the improved path ##
-        ImprovePath(tour2, 1, &R);
+        tour2 = ImprovePath(tour2, 1, &R);
         cout<<"DEBUG IN TSP_LK"<<endl;
         tour2->displayforward();cout<<"$$$$$$$"<<endl;
         
@@ -98,13 +98,13 @@ doublylinkedlist* TSP_LK(doublylinkedlist* thisTour, int MAXITER) {
  *depth is the number of iterations that a single path has been improved.
  *R is a pointer to a vector that records which edges have been used R.at(edge-data)=1 or not used R.at(edge->data)=0
  */
-void ImprovePath(doublylinkedlist* path, int depth, vector<int> *R){
+doublylinkedlist* ImprovePath(doublylinkedlist* path, int depth, vector<int> *R){
    
     cout<<"Improving tour "; path->displayforward();cout<<endl;
 
     //if there is three nodes in the path, no need to improve
     if (path->countNodes() <=3) {
-        return;
+        return path;
     }
     
     //if the depth is smaller than maxdepth, keeps on improving till a better path is found
@@ -132,14 +132,13 @@ void ImprovePath(doublylinkedlist* path, int depth, vector<int> *R){
                         //return the path ##1
                         cout<<"returning!"<<endl;
                         path->displayforward();cout<<"%%%%%%%%%%"<<endl;
-                        return;
+                        return path;
                     }
                     else {
                         path->flipTwoItems(p->data,path->end->data);  //just flip the edge
                         int thisData = p->data;
                         R->at(thisData)=1;
-                        ImprovePath(path, depth+1, R);
-                        return;  //return improvement of ##1
+                        return ImprovePath(path, depth+1, R);
                     }
                 }
             }
@@ -151,7 +150,7 @@ void ImprovePath(doublylinkedlist* path, int depth, vector<int> *R){
         node* p;
         if (path->countNodes() <=3) {
             cout<<"No Need improve path"<<endl;
-            return;
+            return path;
         }
         path->end = path->head->prev;
         
@@ -172,13 +171,11 @@ void ImprovePath(doublylinkedlist* path, int depth, vector<int> *R){
                 tour->flipTwoItems(maxNode->data,path->end->data);
                 cout<<"IM: destroy original path: path in second if"<<endl;
                 path->doublylinkedlist::~doublylinkedlist(); //thisPath.~doublylinkedlist(); //destroy ##1 and the original thisPath
-                path = tour;//return the path of ##2
+                return tour;//return the path of ##2
             }
         }
-        else{
-            }
     }
-    return;
+
 }
 
 

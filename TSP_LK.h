@@ -10,7 +10,7 @@
 
 using namespace std;
 
-void ImprovePath(doublylinkedlist*, int , vector<int>*);
+doublylinkedlist* ImprovePath(doublylinkedlist*, int , vector<int>*);
 float distanceBetweenNodes(node* n1, node* n2);
 //methods in the doublylinked.cpp file
 doublylinkedlist* rayOpt(doublylinkedlist* ,int);
