@@ -53,12 +53,12 @@ doublylinkedlist* TSP_LK(doublylinkedlist* thisTour, int MAXITER) {
     int iter = 0;
     int countNode = thisTour->countNodes();
     doublylinkedlist *tour;
-    tour =  new doublylinkedlist();
+   // tour =  new doublylinkedlist();
     tour = copyList(thisTour, 0 , countNode-1);//created tour##1
     
     while (iter < MAXITER) {
         doublylinkedlist* tour2;
-        tour2 = new doublylinkedlist();
+        //tour2 = new doublylinkedlist();
         tour2 = copyList(tour,0,countNode-1);//construct the tour##2
         node* p = tour2->head;
         for (int i=0; i<iter; i++ ){
@@ -103,7 +103,7 @@ doublylinkedlist* TSP_LK(doublylinkedlist* thisTour, int MAXITER) {
  */
 doublylinkedlist* ImprovePath(doublylinkedlist* Thispath, int depth, vector<int> *R){
    
-    doublylinkedlist* path = new doublylinkedlist();
+    doublylinkedlist* path; //= new doublylinkedlist();
     path = copyList(Thispath,0, Thispath->countNodes()-1);  //construct tour ##1
     
     cout<<"Improving tour "; path->displayforward();cout<<endl;
@@ -126,7 +126,7 @@ doublylinkedlist* ImprovePath(doublylinkedlist* Thispath, int depth, vector<int>
                         distanceBetweenNodes(path->head, p->next)) {
                         //path.displayforward(); cout<<endl;
                         doublylinkedlist* tour;
-                        tour = new doublylinkedlist();
+                       // tour = new doublylinkedlist();
                         tour = copyList(path, 0, path->countNodes()-1); //copy a new tour from path ##2
                         tour->flipTwoItems(p->data, path->end->data);  //flip the two items in tour
                         tour->end = tour->head->prev;
@@ -176,7 +176,7 @@ doublylinkedlist* ImprovePath(doublylinkedlist* Thispath, int depth, vector<int>
                 path->end = path->head -> prev;
                 tour->flipTwoItems(maxNode->data,path->end->data);
                 cout<<"IM: destroy original path: path in second if"<<endl;
-                path->doublylinkedlist::~doublylinkedlist(); //thisPath.~doublylinkedlist(); 
+                path->doublylinkedlist::~doublylinkedlist(); //thisPath.~doublylinkedlist();
                 return tour;//return the path of ##2
             }
         }
@@ -305,7 +305,7 @@ doublylinkedlist* starOpt(doublylinkedlist* P, int K,int NUMITERATIONS)
     float best_distance = P->getDistance(); // starting best distance
     vector < vector <int> > pairs;
     doublylinkedlist* tempList;
-    tempList= new doublylinkedlist();
+    //tempList= new doublylinkedlist();
     
     while (n<NUMITERATIONS) {
         // Find K pairs
