@@ -57,15 +57,19 @@ doublylinkedlist* TSP_LK(doublylinkedlist* thisTour, int MAXITER) {
     tour = copyList(thisTour, 0 , countNode-1);//created tour##1
     
     while (iter < MAXITER) {
-        doublylinkedlist* tour2;
+        //doublylinkedlist* tour2;
         //tour2 = new doublylinkedlist();
-        tour2 = copyList(tour,0,countNode-1);//construct the tour##2
-        node* p = tour2->head;
+       // tour2 = copyList(tour,0,countNode-1);//construct the tour##2
+        //node* p = tour2->head;
+        node* p = tour->head;
+
         for (int i=0; i<iter; i++ ){
             p=p->next;
         }
         //rearrange to form a path
-        tour2->rearrangeList(p->data);
+       // tour2->rearrangeList(p->data);
+        tour->rearrangeList(p->data);
+
         cout<<"REARRANGE"<<endl;
         //now call improve path on this path
         vector<int> R;
@@ -74,24 +78,24 @@ doublylinkedlist* TSP_LK(doublylinkedlist* thisTour, int MAXITER) {
         }
         
         //construct the improved path ##
-        doublylinkedlist *tour3 = ImprovePath(tour2, 1, &R); //construct path ##3
+        doublylinkedlist *tour3 = ImprovePath(tour, 1, &R); //construct path ##2
         cout<<"DEBUG IN TSP_LK"<<endl;
         tour3->displayforward();cout<<"$$$$$$$"<<endl;
         
         if (tour3->getDistance() < tour->getDistance()) {
            tour->doublylinkedlist::~doublylinkedlist(); //destroys the tour##1
-           tour2->doublylinkedlist::~doublylinkedlist(); //destroy the tour##2
+           //tour2->doublylinkedlist::~doublylinkedlist(); //destroy the tour##2
            iter = 0;
-           return tour3;
+           tour = tour3;
         }
        else {
            iter =iter+1;
-           tour2->doublylinkedlist::~doublylinkedlist(); //destorys the tour##3
-           tour3->doublylinkedlist::~doublylinkedlist(); //destroys the tour##1
-           return tour;
+         //  tour2->doublylinkedlist::~doublylinkedlist(); //destorys the tour##3
+           tour3->doublylinkedlist::~doublylinkedlist(); //destroys the tour##2
         }
-       // path->doublylinkedlist::~doublylinkedlist(); //destroy path ##2
+        //tour2->doublylinkedlist::~doublylinkedlist(); //destroy tour ##2
     }
+    
     return tour; //return path##1
 }
 
