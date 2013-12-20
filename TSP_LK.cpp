@@ -32,9 +32,10 @@ int main() {
     printf("debug");
 
     cout<<"distance is "<<bList->getDistance()<<endl;
-    aList->doublylinkedlist::~doublylinkedlist();
-    bList->doublylinkedlist::~doublylinkedlist();
-
+    delete aList;
+    delete bList;
+   // aList->doublylinkedlist::~doublylinkedlist();
+   // bList->doublylinkedlist::~doublylinkedlist();
 }
 
 
@@ -83,7 +84,8 @@ doublylinkedlist* TSP_LK(doublylinkedlist* thisTour, int MAXITER) {
         tour3->displayforward();cout<<"$$$$$$$"<<endl;
         
         if (tour3->getDistance() < tour->getDistance()) {
-           tour->doublylinkedlist::~doublylinkedlist(); //destroys the tour##1
+            delete tour;
+            //tour->doublylinkedlist::~doublylinkedlist(); //destroys the tour##1
            //tour2->doublylinkedlist::~doublylinkedlist(); //destroy the tour##2
            iter = 0;
            tour = tour3;
@@ -91,7 +93,8 @@ doublylinkedlist* TSP_LK(doublylinkedlist* thisTour, int MAXITER) {
        else {
            iter =iter+1;
          //  tour2->doublylinkedlist::~doublylinkedlist(); //destorys the tour##3
-           tour3->doublylinkedlist::~doublylinkedlist(); //destroys the tour##2
+           delete tour3;
+           //tour3->doublylinkedlist::~doublylinkedlist(); //destroys the tour##2
         }
         //tour2->doublylinkedlist::~doublylinkedlist(); //destroy tour ##2
     }
@@ -135,7 +138,8 @@ doublylinkedlist* ImprovePath(doublylinkedlist* Thispath, int depth, vector<int>
                         tour->flipTwoItems(p->data, path->end->data);  //flip the two items in tour
                         tour->end = tour->head->prev;
                         cout<<"IM: destroy original path: path in first if"<<endl;
-                        path->doublylinkedlist::~doublylinkedlist();                     //destroy path ##1
+                        //path->doublylinkedlist::~doublylinkedlist();                     //destroy path ##1
+                        delete path;
                         cout<<"IM: destroy original path: thisPath in first if"<<endl;
                         path = tour;
                         cout<<"returning!"<<endl;
@@ -147,7 +151,8 @@ doublylinkedlist* ImprovePath(doublylinkedlist* Thispath, int depth, vector<int>
                         int thisData = p->data;
                         R->at(thisData)=1;
                         doublylinkedlist* result = ImprovePath(path, depth+1, R); //construct result ##3;
-                        path->~doublylinkedlist();//destroy path ##1
+                        delete path;
+                        //path->~doublylinkedlist();//destroy path ##1
                         return result; //return ##3
                     }
                 }
@@ -180,7 +185,8 @@ doublylinkedlist* ImprovePath(doublylinkedlist* Thispath, int depth, vector<int>
                 path->end = path->head -> prev;
                 tour->flipTwoItems(maxNode->data,path->end->data);
                 cout<<"IM: destroy original path: path in second if"<<endl;
-                path->doublylinkedlist::~doublylinkedlist(); //thisPath.~doublylinkedlist();
+                delete path;
+                //path->doublylinkedlist::~doublylinkedlist(); //thisPath.~doublylinkedlist();
                 return tour;//return the path of ##2
             }
         }
@@ -267,7 +273,8 @@ doublylinkedlist* rayOpt(doublylinkedlist* P,int NUMITERATIONS) //number of iter
             tempList->end = tempList->head -> prev;
             
             current_distance = tempList->getDistance();
-            tempList->doublylinkedlist::~doublylinkedlist();
+            delete tempList;
+            //tempList->doublylinkedlist::~doublylinkedlist();
             
             printf("%d. Trying flip: (%d %d)(%d %d), distance = %f\n",n,temp[0],temp[1],temp[2],temp[3],current_distance);
             
@@ -278,7 +285,8 @@ doublylinkedlist* rayOpt(doublylinkedlist* P,int NUMITERATIONS) //number of iter
                 tempList->displayforward();cout<<endl;
                // tempList.end = tempList.head -> prev;
                 P->displayforward(); cout<<endl;
-                P->doublylinkedlist::~doublylinkedlist();
+                delete P;
+                //P->doublylinkedlist::~doublylinkedlist();
                 P = copyList(tempList,0,num_nodes-1);
                 cout<<"DIsplay templist: "<<endl;
                 //P.displayforward(); cout<<endl;
@@ -394,13 +402,15 @@ doublylinkedlist* starOpt(doublylinkedlist* P, int K,int NUMITERATIONS)
             if (current_distance<best_distance) {
                 best_distance = current_distance;
                 printf("BEST = %f\n",best_distance);
-                P->doublylinkedlist::~doublylinkedlist();
+                delete P;
+               // P->doublylinkedlist::~doublylinkedlist();
                 cout<<"COPY IN DEBUG: "<<num_nodes<<" nodes"<<endl;
                 tempList->displayforward();cout<<endl<<endl;
                 P = copyList(tempList,0,num_nodes-1);
                 n = 0;
             }
-            tempList->~doublylinkedlist();
+            delete tempList;
+            //tempList->~doublylinkedlist();
         }
     }
     printf("BEST = %f\n",best_distance);
@@ -464,7 +474,8 @@ doublylinkedlist* TwoOpt(doublylinkedlist* P, int NUMITERATIONS)
             tempList->end = tempList->head -> prev;
             
             current_distance = tempList->getDistance();
-            tempList->~doublylinkedlist();
+            delete tempList;
+            //tempList->~doublylinkedlist();
             
             printf("%d. Trying flip: (%d %d)(%d %d), distance = %f\n",n,temp[0],temp[1],temp[2],temp[3],current_distance);
             
@@ -475,7 +486,8 @@ doublylinkedlist* TwoOpt(doublylinkedlist* P, int NUMITERATIONS)
                 tempList->displayforward();cout<<endl;
                 // tempList.end = tempList.head -> prev;
                 P->displayforward(); cout<<endl;
-                P->~doublylinkedlist();
+                delete P;
+                //P->~doublylinkedlist();
                 P = copyList(tempList,0,num_nodes-1);
                 cout<<"DIsplay templist: "<<endl;
                 //P.displayforward(); cout<<endl;

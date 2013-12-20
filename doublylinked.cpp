@@ -124,8 +124,8 @@ void doublylinkedlist::createList(int ind[], int xPos[], int yPos[], int n)
 
 
 doublylinkedlist::~doublylinkedlist(){
-    node* current = head->next;
     if (head!=NULL) {
+        node* current = head->next;
         while( current != head ) {
             node* next = current->next;
             delete current;
