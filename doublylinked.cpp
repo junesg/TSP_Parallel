@@ -139,6 +139,7 @@ doublylinkedlist::~doublylinkedlist(){
 
 void doublylinkedlist::rearrangeList(int start){
 	//Now loop through to make sure head is always the 0_th item
+
 	node* p=head;
 	if (p->data != start) {
 	    p = p-> next;
@@ -150,12 +151,14 @@ void doublylinkedlist::rearrangeList(int start){
     
     //also change the prev pointers
     node* q = head;
-    for (p=head->next; p!=head; p = p->next) {
+    for (p=head->next; p!=head; ) {
         p->prev = q;
         q = p;
+		p = p->next;
     }
     end = q;
 	head ->prev = q;
+		
 }
 
 //takes in the data of a node, get the next node's data
@@ -226,9 +229,6 @@ void doublylinkedlist::insertAfter(int item, int x, int y, int key) {
 	}
     
 	node *p=new node(item, (float)x, (float)y);
-//	p->data=item;
-//    p->x=x;
-//    p->y=y;
 	p->next=q->next;
 	p->prev=q;
 	q->next=p;
@@ -236,7 +236,6 @@ void doublylinkedlist::insertAfter(int item, int x, int y, int key) {
 
 //displaying list nodes in forward direction
 void doublylinkedlist::displayforward() {
-	cout<<"In display:"<<endl;
     node *p=head;
     if (head == NULL) {
         printf("Can not display\n");
@@ -248,8 +247,7 @@ void doublylinkedlist::displayforward() {
         p=p->next;
         if (p==NULL || p==head) break;
 	}
-    cout<<"End display"<<endl;
-
+	cout<<endl;
 }
 
 //displaying list nodes in reverse direction
@@ -359,19 +357,8 @@ void doublylinkedlist:: flipTwoItems(const int pair11, const int pair21){
 
 }
 
-/*
-void doublylinkedlist::showDistance() {
-    node *p;
-    float distance = 0;
-    p = head;
-    while (1) {
-        distance += sqrt(pow(p->x - p->next->x,2)+pow(p->y - p->next->y,2));
-		cout<<"From "<<p->data<<" <"<<p->x<<","<<p->y<<"> to "<<p->next->data<<" <"<<p->next->x<<","<<p->next->y<<"> distance= "<<distance<<endl;
-        p=p->next;
-        if (p==head) break;
-    }
-}
- */
+
+ 
 //delete the ith node of the list 
 void doublylinkedlist::deleteNode(int i){
 	node *p;
@@ -534,6 +521,7 @@ bool doublylinkedlist::compareList(doublylinkedlist aList){
 		//cout<<" "<<thisp->data<<" compared to "<<thatp->data<<endl;
 		if(thisp->data != thatp->data)
 			return false;
+		thisp = thisp -> next; thatp = thatp -> next;
     }
     return true;
 }

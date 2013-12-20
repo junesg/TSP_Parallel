@@ -11,7 +11,7 @@ using namespace std;
 #define LISTSIZE 10
 
 
-
+/*
 int main() {
     doublylinkedlist* aList;
     aList = new doublylinkedlist();
@@ -37,7 +37,7 @@ int main() {
    // aList->doublylinkedlist::~doublylinkedlist();
    // bList->doublylinkedlist::~doublylinkedlist();
 }
-
+*/
 
 
 float distanceBetweenNodes(node* n1, node* n2){
