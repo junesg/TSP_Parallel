@@ -107,14 +107,18 @@ int main(){
 	cout<<"***********"<<endl;
 	for (vector<float>::iterator it=distances.begin(); it!= distances.end(); it++) {
 		cout<<*it<<" ";
-	}	
-	for (vector<doublylinkedlist >::iterator it=group.begin(); it!= group.end(); it++) {
+	}
+	*/
+	//Now destroying the group that we have stored.
+	for (int i=0; i< group.size(); it++) {
 		cout<<endl;		
-		(*it).displayforward();	
+		group.at(it).displayforward();	cout<<"deleted"<<endl;
+		doublylinkedlist *p;
+		*p = group.at(it);
+		delete p;
 	}
 		cout<<endl<<"***********"<<endl;
-*/
-	
+
 }
 
 
@@ -211,31 +215,30 @@ vector<doublylinkedlist> GenerateInitPopulation(std::vector< pair<int,int> > coo
 	std::vector<doublylinkedlist> population;
 	for(int j=0 ; j< POPULATION; ){
 		//cout<<"Loop1!"<<endl;
-		doublylinkedlist newList = GenerateOneSpecies(coordinates,j, ind);
-		newList.rearrangeList(0); //the index data ==1 node is the start of the list
+		doublylinkedlist* newList = GenerateOneSpecies(coordinates,j, ind);
+		newList->rearrangeList(ind[0]); //the index data ==1 node is the start of the list
 		//cout<<"generated: "; newList.displayforward();cout<<endl;
 		bool exists = false;
 		for(int i=0; i< population.size(); i++){
 			//population.at(i).displayforward();
-			exists = exists || population.at(i).compareList(newList); 
+			exists = exists || population.at(i).compareList(*newList); 
 		//	cout<<"Loop2! exist = "<<exists<<endl;
 		}
 		if(!exists) {
-			population.push_back(newList);
+			population.push_back(*newList);
 			cout<<" population size: "<<population.size()<<endl;
 			newList.rearrangeList(0);
 			newList.displayforward();
 			cout<<"          pushed Back"<<endl;
 			j++;
 		}
-	//	newList.destroy();	
-	//	newList.~doublylinkedlist();
+		delete newList;	//	newList.~doublylinkedlist();
 	}
 	return population;
 }
 
 //function to create one species using the seed as a random generator seed
-doublylinkedlist GenerateOneSpecies(std::vector< pair<int,int> > coordinates,int seed, int* ind){
+doublylinkedlist* GenerateOneSpecies(std::vector< pair<int,int> > coordinates,int seed, int* ind){
 	//std::srand ( unsigned ( seed ) );
 
 	int n = coordinates.size(); //number of items
@@ -283,9 +286,10 @@ doublylinkedlist GenerateOneSpecies(std::vector< pair<int,int> > coordinates,int
 	xArr  = &xPos[0];
 	yArr  = &yPos[0];
 	index = &arr[0];
-	doublylinkedlist species;
-	species.createList( index , xArr , yArr, n); 
-	species.displayforward(); cout<< "  created"<<endl;
+	doublylinkedlist* species;
+	species = new doublylinkedlist();
+	species->createList( index , xArr , yArr, n); 
+	//species->displayforward(); cout<< "  created"<<endl;
 	return species;
 }
 
