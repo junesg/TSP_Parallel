@@ -46,7 +46,7 @@ int main(){
 	
 	cout<<"Coordinates size = "<<coordinates.size()<<endl;	
 
-	vector<doublylinkedlist > group =  GenerateInitPopulation(coordinates,ind);
+	vector<doublylinkedlist> group =  GenerateInitPopulation(coordinates,ind);
 	
     cout<<"FINISH GENERATION"<<endl;
 	

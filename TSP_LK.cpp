@@ -437,7 +437,7 @@ doublylinkedlist* TwoOpt(doublylinkedlist* P, int NUMITERATIONS)
     float best_distance = P->getDistance();
     vector<vector<int> > pairs;
     doublylinkedlist* tempList;
-    tempList= new doublylinkedlist();
+    //tempList= new doublylinkedlist();
     
     while (n < NUMITERATIONS && n < num_nodes*(num_nodes-3)/2) {
         // Get pairs
@@ -468,7 +468,7 @@ doublylinkedlist* TwoOpt(doublylinkedlist* P, int NUMITERATIONS)
             pairs[n][0] = temp[0];
             pairs[n][1] = temp[2];
             
-            tempList = copyList(P, 0, num_nodes-1);
+            tempList = copyList(P, 0, num_nodes-1); //create tempList ##1
             
             tempList->flipTwoItems(temp[0], temp[2]);
             tempList->end = tempList->head -> prev;
@@ -482,14 +482,14 @@ doublylinkedlist* TwoOpt(doublylinkedlist* P, int NUMITERATIONS)
             if (current_distance<best_distance) {
                 best_distance = current_distance; // Update best distance
                 printf("BEST = %f\n",best_distance);
-                cout<<"DIsplay: "<<endl;
+                cout<<"Display: "<<endl;
                 tempList->displayforward();cout<<endl;
                 // tempList.end = tempList.head -> prev;
-                P->displayforward(); cout<<endl;
+                //P->displayforward(); cout<<endl;
                 delete P;
                 //P->~doublylinkedlist();
                 P = copyList(tempList,0,num_nodes-1);
-                cout<<"DIsplay templist: "<<endl;
+                cout<<"Display templist: "<<endl;
                 //P.displayforward(); cout<<endl;
                 printf("debug");
                 n = 0;
