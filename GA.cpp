@@ -23,7 +23,7 @@ using namespace std;
 
 doublylinkedlist* crossOver1(doublylinkedlist *p1,doublylinkedlist* p2);
 doublylinkedlist* GenerateOneSpecies(std::vector<pair<int,int> > coordinates,int seed, int* ind);
-vector<doublylinkedlist*> GenerateInitPopulation(std::vector <pair<int,int> > coordinates, int* ind);
+vector<doublylinkedlist*>* GenerateInitPopulation(std::vector <pair<int,int> > coordinates, int* ind);
 double sortPopDistance(vector< doublylinkedlist* >  *list, vector<float> *distances, int left, int right);
 int myrandom (int i);
 void PopulationBreeding(std::vector<doublylinkedlist*>* group, double fitDistance );
@@ -45,7 +45,7 @@ int main(){
 	
 	cout<<"Coordinates size = "<<coordinates.size()<<endl;	
 
-	vector<doublylinkedlist*> group;
+	vector<doublylinkedlist*>* group;
 	group =  GenerateInitPopulation(coordinates,ind);
 	
     cout<<"FINISH GENERATION"<<endl;
@@ -92,7 +92,7 @@ int main(){
 //    
 //    
 	//cout<<endl<<" ****** After one round of breeding"<<endl;
-	  for (vector<doublylinkedlist *>::iterator it=group.begin(); it!= group.end(); it++) {
+	  for (vector<doublylinkedlist *>::iterator it=group->begin(); it!= group->end(); it++) {
 			(*it)->rearrangeList(0);	       		       	
 			(*it)->displayforward();
 			cout<<"   with distance: "<<(*it)->getDistance()<<endl;
@@ -203,9 +203,32 @@ doublylinkedlist* crossOver1(doublylinkedlist* p1,doublylinkedlist* p2){
 
 //Generate a group of linked lists as the initial population of the system
 //This takes in the ###WHERE THE PROBLEM IS
-vector<doublylinkedlist*> GenerateInitPopulation(std::vector< pair<int,int> > coordinates, int* ind){
-	vector<doublylinkedlist*> population;
-	for(int j=0 ; j< POPULATION; ){
+vector<doublylinkedlist*>* GenerateInitPopulation(std::vector< pair<int,int> > coordinates, int* ind){
+	vector<doublylinkedlist*> *population;
+    population = new vector<doublylinkedlist*>(POPULATION);
+    
+    for (int i=0; i< POPULATION;) {
+        population->push_back(GenerateOneSpecies(coordinates,i,ind));
+        population->at(i)->displayforward();
+        cout<<" pushed back"<<endl;
+        bool repeat = false;
+        for (int j=0; j<i; j++) {
+            //if this list already exists
+            if (population->at(j)->compareList(*(population->at(i)))) {
+                cout<<" already exisits as the "<<j<<"th element"<<endl;
+                delete population->at(i);
+                population->erase(population->begin()+j-1);
+                repeat = true;
+            }
+        }
+        if (!repeat) {
+            i++;
+        }
+    }
+	
+    
+    /*
+    for(int j=0 ; j< POPULATION; ){
 		doublylinkedlist* newList;
 		newList = GenerateOneSpecies(coordinates,j, ind); //newly created doublylinkedlist
 		cout<<"#####ind["<<j<<"] is "<<ind[j]<<";"<<endl;
@@ -217,13 +240,12 @@ vector<doublylinkedlist*> GenerateInitPopulation(std::vector< pair<int,int> > co
 		if(j>0) {
 			for(int i=0; i< j; i++){
 				cout<<"showing population("<<i<<"):"<<endl;
-				population.at(i)->displayforward();
+				population->at(i)->displayforward();
+                (*newList).displayforward();
                 cout<<"TRYING BEFORE FINISHED:"<<endl;
-				//PROBLEM HERE!!!!!!!!!##########
-                bool test = population.at(i)->compareList(*newList);
+                bool test = p->compareList(q);
+                q.~doublylinkedlist();
                 
-                cout<<"Test bool value is "<<test<<endl;
-                cout<<"TRYING AFTER FINISHED:"<<endl;
 
 				exists = (exists || test);
 
@@ -232,19 +254,21 @@ vector<doublylinkedlist*> GenerateInitPopulation(std::vector< pair<int,int> > co
 		}
 
 		if(!exists) {
-			population.push_back(newList);
+			population->push_back(newList);
 			cout<<"$$$$$$$1$$$$$$$$";
 			newList ->displayforward(); cout<<endl;
-			population.at(j)->displayforward();cout<<"pushed back1"<<endl;
+			population->at(j)->displayforward();cout<<"pushed back1"<<endl;
 			cout<<"$$$$$$$2$$$$$$$$  "<<endl;
 			//newList->rearrangeList(0);
 			//newList->displayforward();
 			//cout<<"pushed Backllkk2"<<endl;
 			j++;
 		}
-
-		//	delete newList;
+        cout<<"extra display:";
+		population->at(j-1)->displayforward();
 	}
+    */
+    
 	return population;
 }
 

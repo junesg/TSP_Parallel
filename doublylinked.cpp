@@ -27,7 +27,7 @@ int main(){
     printf("\n");
     //rayOpt(aList);
     
-   // bList.~doublylinkedlist();
+   // bList.   ylinkedlist();
     aList.destroy();
     aList.~doublylinkedlist();
     //printf("STAR OPT\n");
@@ -124,6 +124,8 @@ void doublylinkedlist::createList(int ind[], int xPos[], int yPos[], int n)
 
 
 doublylinkedlist::~doublylinkedlist(){
+    cout<<"deleting:";
+    displayforward();
     if (head!=NULL) {
         node* current = head->next;
         while( current != head ) {
@@ -133,7 +135,7 @@ doublylinkedlist::~doublylinkedlist(){
             current = next;
         }
         delete(current);
-        cout<<"finished"<<endl;
+        cout<<"delete finished"<<endl;
     }
 }
 
