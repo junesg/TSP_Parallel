@@ -46,7 +46,7 @@ public:
     void getContentAt(int, int arr[3]);
     void flipNodes(int,int);
     void flipKItems(int,int*);
-	bool compareList(doublylinkedlist);
+	bool compareList(doublylinkedlist*);
 };
 
 //copyList is the only function that dynamically allocates

@@ -160,7 +160,6 @@ void doublylinkedlist::rearrangeList(int start){
     }
     end = q;
 	head ->prev = q;
-		
 }
 
 //takes in the data of a node, get the next node's data
@@ -507,26 +506,26 @@ void doublylinkedlist::flipKItems(int K, int *temp) {
     
 //compares this current list with another input list aList
 //starts from the head and examines every data afterwards
-bool doublylinkedlist::compareList(doublylinkedlist aList){
+bool doublylinkedlist::compareList(doublylinkedlist* aList){
 	node* thisp= head;
 	
-    aList.rearrangeList(head->data);
-    node* thatp = aList.head;
+    aList->rearrangeList(head->data);
+    node* thatp = aList->head;
     
 	if(thisp->data != thatp->data){
-        cout<<"returning"<<endl;
+        cout<<"returning false"<<endl;
         return false;
     }
 	thisp = thisp->next;
 	thatp = thatp->next;
-	while(thisp != head && thatp != aList.head) {
+	while(thisp != head && thatp != aList->head) {
 		//cout<<" "<<thisp->data<<" compared to "<<thatp->data<<endl;
 		if(thisp->data != thatp->data) {
-            cout<<"returning"<<endl;
+            cout<<"returning false"<<endl;
 			return false;
         }
 		thisp = thisp -> next; thatp = thatp -> next;
     }
-    cout<<"returning"<<endl;
+    cout<<"returning true"<<endl;
     return true;
 }

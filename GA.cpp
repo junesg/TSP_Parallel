@@ -51,46 +51,46 @@ int main(){
     cout<<"FINISH GENERATION"<<endl;
 	
     //DEFINE CONVERGENCE
-//    
-//    int numberOfIteration = 10;
-//    
-//    while (numberOfIteration > 0) {
-//        numberOfIteration --;
-//        //now generate a distance matrix
-//        vector<float> distances;
-//        for (vector<doublylinkedlist* >::iterator it=group.begin(); it!= group.end(); it++) {
-//    //		(*it).displayforward();
-//    //		cout<<endl;
-//    //		cout<<(*it).getDistance()<<endl;
-//            distances.push_back((*it)->getDistance());
-//        }
-//        
-//        
-//        
-//        
-//        cout<<"Distancs has "<<distances.size()<<" elements"<<endl;
-//        double fitDistance = sortPopDistance(&group, &distances,0,distances.size()-1);
-//        cout<<"fit Distance: "<<fitDistance<<endl;
-//
-//        for (vector<doublylinkedlist* >::iterator it=group.begin(); it!= group.end(); it++)
-//        {
-//             (*it)->rearrangeList(0);
-//             (*it)->displayforward();
-//             cout<<"   with distance: "<<(*it)->getDistance()<<endl;
-//             cout<<endl;
-//         }
-//            
-//        
-//        //combine for breeding ##############3
-//        //NEED TO DO: to select a pair randomly from the top breedProp population.
-//        
-//        PopulationBreeding(&group, fitDistance );
-//
-//    }
-//    
-//    
-//    
-//    
+    
+    int numberOfIteration = 10;
+    
+    while (numberOfIteration > 0) {
+        numberOfIteration --;
+        //now generate a distance matrix
+        vector<float> distances;
+        for (vector<doublylinkedlist* >::iterator it=group->begin(); it!= group->end(); it++) {
+    //		(*it).displayforward();
+    //		cout<<endl;
+    //		cout<<(*it).getDistance()<<endl;
+            distances.push_back((*it)->getDistance());
+        }
+        
+        
+        
+        
+        cout<<"Distancs has "<<distances.size()<<" elements"<<endl;
+        double fitDistance = sortPopDistance(group, &distances,0,distances.size()-1);
+        cout<<"fit Distance: "<<fitDistance<<endl;
+
+        for (vector<doublylinkedlist* >::iterator it=group->begin(); it!= group->end(); it++)
+        {
+             (*it)->rearrangeList(0);
+             (*it)->displayforward();
+             cout<<"   with distance: "<<(*it)->getDistance()<<endl;
+             cout<<endl;
+         }
+            
+        
+        //combine for breeding ##############3
+        //NEED TO DO: to select a pair randomly from the top breedProp population.
+        
+        PopulationBreeding(group, fitDistance );
+
+    }
+    
+    
+    
+    
 	//cout<<endl<<" ****** After one round of breeding"<<endl;
 	  for (vector<doublylinkedlist *>::iterator it=group->begin(); it!= group->end(); it++) {
 			(*it)->rearrangeList(0);	       		       	
@@ -98,10 +98,10 @@ int main(){
 			cout<<"   with distance: "<<(*it)->getDistance()<<endl;
 	       	cout<<endl;
 	 }
-//
-//   
-//
-//
+
+   
+
+
 
 /*
 	cout<<"***********"<<endl;
@@ -205,7 +205,7 @@ doublylinkedlist* crossOver1(doublylinkedlist* p1,doublylinkedlist* p2){
 //This takes in the ###WHERE THE PROBLEM IS
 vector<doublylinkedlist*>* GenerateInitPopulation(std::vector< pair<int,int> > coordinates, int* ind){
 	vector<doublylinkedlist*> *population;
-    population = new vector<doublylinkedlist*>(POPULATION);
+    population = new vector<doublylinkedlist*>();
     
     for (int i=0; i< POPULATION;) {
         population->push_back(GenerateOneSpecies(coordinates,i,ind));
@@ -214,12 +214,17 @@ vector<doublylinkedlist*>* GenerateInitPopulation(std::vector< pair<int,int> > c
         bool repeat = false;
         for (int j=0; j<i; j++) {
             //if this list already exists
-            if (population->at(j)->compareList(*(population->at(i)))) {
+            cout<<"the "<<j<<"th item is "<<endl;
+            population->at(j)->displayforward();
+            
+            cout<<"***** BEGIN COMPARE*******"<<endl;
+            if (population->at(j)->compareList(population->at(i))) {
                 cout<<" already exisits as the "<<j<<"th element"<<endl;
                 delete population->at(i);
-                population->erase(population->begin()+j-1);
+                population->erase(population->begin()+i);
                 repeat = true;
             }
+            cout<<"***** AFTER COMPARE*******"<<endl;
         }
         if (!repeat) {
             i++;
