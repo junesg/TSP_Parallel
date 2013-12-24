@@ -36,6 +36,7 @@ int main() {
     delete bList;
    // aList->doublylinkedlist::~doublylinkedlist();
    // bList->doublylinkedlist::~doublylinkedlist();
+    
 }
 */
 
@@ -496,9 +497,9 @@ doublylinkedlist* TwoOpt(doublylinkedlist* P, int NUMITERATIONS)
             } else n++;
         }
     }
-    printf("debugBEST = %f\n",best_distance);
+    //printf("debugBEST = %f\n",best_distance);
     P->end = P->head ->prev;
-    P->displayforward();
-    printf("\n");
+    //P->displayforward();
+    //printf("\n");
     return P;
 }

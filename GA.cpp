@@ -23,7 +23,7 @@ using namespace std;
 
 doublylinkedlist* crossOver1(doublylinkedlist *p1,doublylinkedlist* p2);
 doublylinkedlist* GenerateOneSpecies(std::vector<pair<int,int> > coordinates,int seed, int* ind);
-vector<doublylinkedlist* >  GenerateInitPopulation(std::vector <pair<int,int> > coordinates, int* ind);
+vector<doublylinkedlist*>  GenerateInitPopulation(std::vector <pair<int,int> > coordinates, int* ind);
 double sortPopDistance(vector< doublylinkedlist* >  *list, vector<float> *distances, int left, int right);
 int myrandom (int i);
 void PopulationBreeding(std::vector<doublylinkedlist*>* group, double fitDistance );
@@ -45,8 +45,8 @@ int main(){
 	
 	cout<<"Coordinates size = "<<coordinates.size()<<endl;	
 
-	vector<doublylinkedlist*> *group;
-	*group =  GenerateInitPopulation(coordinates,ind);
+	vector<doublylinkedlist*> group;
+	group =  GenerateInitPopulation(coordinates,ind);
 	
     cout<<"FINISH GENERATION"<<endl;
 	
@@ -58,7 +58,7 @@ int main(){
         numberOfIteration --;
         //now generate a distance matrix
         vector<float> distances;
-        for (vector<doublylinkedlist* >::iterator it=group->begin(); it!= group->end(); it++) {
+        for (vector<doublylinkedlist* >::iterator it=group.begin(); it!= group.end(); it++) {
     //		(*it).displayforward();
     //		cout<<endl;
     //		cout<<(*it).getDistance()<<endl;
@@ -69,10 +69,10 @@ int main(){
         
         
         cout<<"Distancs has "<<distances.size()<<" elements"<<endl;
-        double fitDistance = sortPopDistance(group, &distances,0,distances.size()-1);
+        double fitDistance = sortPopDistance(&group, &distances,0,distances.size()-1);
         cout<<"fit Distance: "<<fitDistance<<endl;
 
-        for (vector<doublylinkedlist* >::iterator it=group->begin(); it!= group->end(); it++)
+        for (vector<doublylinkedlist* >::iterator it=group.begin(); it!= group.end(); it++)
         {
              (*it)->rearrangeList(0);
              (*it)->displayforward();
@@ -84,7 +84,7 @@ int main(){
         //combine for breeding ##############3
         //NEED TO DO: to select a pair randomly from the top breedProp population.
         
-        PopulationBreeding(group, fitDistance );
+        PopulationBreeding(&group, fitDistance );
 
     }
     
@@ -92,7 +92,7 @@ int main(){
     
     
 	cout<<endl<<" ****** After one round of breeding"<<endl;
-	  for (vector<doublylinkedlist *>::iterator it=group->begin(); it!= group->end(); it++) {
+	  for (vector<doublylinkedlist *>::iterator it=group.begin(); it!= group.end(); it++) {
 			(*it)->rearrangeList(0);	       		       	
 			(*it)->displayforward();
 			cout<<"   with distance: "<<(*it)->getDistance()<<endl;
@@ -110,7 +110,7 @@ int main(){
 	}
 	*/
 	//Now destroying the group that we have stored.
-	delete[] *group;
+	//delete[] group;
 	cout<<endl<<"***********"<<endl;
 
 }
@@ -142,11 +142,12 @@ void PopulationBreeding(std::vector<doublylinkedlist*>* group, double fitDistanc
 			int size = group->size();
 			delete group->at(breedPop + i);
 			//add new element to the list
-			group->at(breedPop + i)  = aList;
+			group->at(breedPop + i)  = copyList(aList,0,aList->countNodes()-1);
 			//replace the lower ranked population
 			cout<<" is accepted"<<endl;
 			i++;
 		}
+        delete aList;
 	}
 }
 
