@@ -23,7 +23,7 @@ using namespace std;
 
 doublylinkedlist* crossOver1(doublylinkedlist *p1,doublylinkedlist* p2);
 doublylinkedlist* GenerateOneSpecies(std::vector<pair<int,int> > coordinates,int seed, int* ind);
-vector<doublylinkedlist*>  GenerateInitPopulation(std::vector <pair<int,int> > coordinates, int* ind);
+vector<doublylinkedlist*> GenerateInitPopulation(std::vector <pair<int,int> > coordinates, int* ind);
 double sortPopDistance(vector< doublylinkedlist* >  *list, vector<float> *distances, int left, int right);
 int myrandom (int i);
 void PopulationBreeding(std::vector<doublylinkedlist*>* group, double fitDistance );
@@ -51,57 +51,57 @@ int main(){
     cout<<"FINISH GENERATION"<<endl;
 	
     //DEFINE CONVERGENCE
-    
-    int numberOfIteration = 10;
-    
-    while (numberOfIteration > 0) {
-        numberOfIteration --;
-        //now generate a distance matrix
-        vector<float> distances;
-        for (vector<doublylinkedlist* >::iterator it=group.begin(); it!= group.end(); it++) {
-    //		(*it).displayforward();
-    //		cout<<endl;
-    //		cout<<(*it).getDistance()<<endl;
-            distances.push_back((*it)->getDistance());
-        }
-        
-        
-        
-        
-        cout<<"Distancs has "<<distances.size()<<" elements"<<endl;
-        double fitDistance = sortPopDistance(&group, &distances,0,distances.size()-1);
-        cout<<"fit Distance: "<<fitDistance<<endl;
-
-        for (vector<doublylinkedlist* >::iterator it=group.begin(); it!= group.end(); it++)
-        {
-             (*it)->rearrangeList(0);
-             (*it)->displayforward();
-             cout<<"   with distance: "<<(*it)->getDistance()<<endl;
-             cout<<endl;
-         }
-            
-        
-        //combine for breeding ##############3
-        //NEED TO DO: to select a pair randomly from the top breedProp population.
-        
-        PopulationBreeding(&group, fitDistance );
-
-    }
-    
-    
-    
-    
-	cout<<endl<<" ****** After one round of breeding"<<endl;
+//    
+//    int numberOfIteration = 10;
+//    
+//    while (numberOfIteration > 0) {
+//        numberOfIteration --;
+//        //now generate a distance matrix
+//        vector<float> distances;
+//        for (vector<doublylinkedlist* >::iterator it=group.begin(); it!= group.end(); it++) {
+//    //		(*it).displayforward();
+//    //		cout<<endl;
+//    //		cout<<(*it).getDistance()<<endl;
+//            distances.push_back((*it)->getDistance());
+//        }
+//        
+//        
+//        
+//        
+//        cout<<"Distancs has "<<distances.size()<<" elements"<<endl;
+//        double fitDistance = sortPopDistance(&group, &distances,0,distances.size()-1);
+//        cout<<"fit Distance: "<<fitDistance<<endl;
+//
+//        for (vector<doublylinkedlist* >::iterator it=group.begin(); it!= group.end(); it++)
+//        {
+//             (*it)->rearrangeList(0);
+//             (*it)->displayforward();
+//             cout<<"   with distance: "<<(*it)->getDistance()<<endl;
+//             cout<<endl;
+//         }
+//            
+//        
+//        //combine for breeding ##############3
+//        //NEED TO DO: to select a pair randomly from the top breedProp population.
+//        
+//        PopulationBreeding(&group, fitDistance );
+//
+//    }
+//    
+//    
+//    
+//    
+	//cout<<endl<<" ****** After one round of breeding"<<endl;
 	  for (vector<doublylinkedlist *>::iterator it=group.begin(); it!= group.end(); it++) {
 			(*it)->rearrangeList(0);	       		       	
 			(*it)->displayforward();
 			cout<<"   with distance: "<<(*it)->getDistance()<<endl;
 	       	cout<<endl;
 	 }
-
-   
-
-
+//
+//   
+//
+//
 
 /*
 	cout<<"***********"<<endl;
@@ -204,12 +204,11 @@ doublylinkedlist* crossOver1(doublylinkedlist* p1,doublylinkedlist* p2){
 //Generate a group of linked lists as the initial population of the system
 //This takes in the ###WHERE THE PROBLEM IS
 vector<doublylinkedlist*> GenerateInitPopulation(std::vector< pair<int,int> > coordinates, int* ind){
-	std::vector<doublylinkedlist*> population;
-
+	vector<doublylinkedlist*> population;
 	for(int j=0 ; j< POPULATION; ){
 		doublylinkedlist* newList;
-		newList = GenerateOneSpecies(coordinates,j, ind);
-		cout<<"#####ind[0] is "<<ind[0]<<endl;
+		newList = GenerateOneSpecies(coordinates,j, ind); //newly created doublylinkedlist
+		cout<<"#####ind["<<j<<"] is "<<ind[j]<<";"<<endl;
 		newList->rearrangeList(ind[0]); //the index data ==1 node is the start of the list
 		//cout<<"generated: "; newList.displayforward();cout<<endl;
 		bool exists = false;
@@ -219,8 +218,15 @@ vector<doublylinkedlist*> GenerateInitPopulation(std::vector< pair<int,int> > co
 			for(int i=0; i< j; i++){
 				cout<<"showing population("<<i<<"):"<<endl;
 				population.at(i)->displayforward();
+                cout<<"TRYING BEFORE FINISHED:"<<endl;
 				//PROBLEM HERE!!!!!!!!!##########
-				exists = (exists || population.at(i)->compareList(*newList)); 
+                bool test = population.at(i)->compareList(*newList);
+                
+                cout<<"Test bool value is "<<test<<endl;
+                cout<<"TRYING AFTER FINISHED:"<<endl;
+
+				exists = (exists || test);
+
 				cout<<"Loop2! exist = "<<exists<<endl;
 			}
 		}
@@ -231,9 +237,9 @@ vector<doublylinkedlist*> GenerateInitPopulation(std::vector< pair<int,int> > co
 			newList ->displayforward(); cout<<endl;
 			population.at(j)->displayforward();cout<<"pushed back1"<<endl;
 			cout<<"$$$$$$$2$$$$$$$$  "<<endl;
-			newList->rearrangeList(0);
-			newList->displayforward();
-			cout<<"pushed Backllkk2"<<endl;
+			//newList->rearrangeList(0);
+			//newList->displayforward();
+			//cout<<"pushed Backllkk2"<<endl;
 			j++;
 		}
 
@@ -252,17 +258,11 @@ doublylinkedlist* GenerateOneSpecies(std::vector< pair<int,int> > coordinates,in
 	vector<int> yPos;
 	//create the array of indexs
 	std::vector<int> arr;
-/*
-	cout<<"Before shuffling: ";
-*/
+
 	for(int i = 0; i< n; i++) {
 		arr.push_back(ind[i]);
 	}
-
-  //	std::random_shuffle (arr.begin(), arr.end(), myrandom);
-
 	 random_shuffle (arr.begin(), arr.end());
-	
 	//create the doublylinkedlist
 	
 	int *xArr, *yArr, *index;

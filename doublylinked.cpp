@@ -506,22 +506,25 @@ void doublylinkedlist::flipKItems(int K, int *temp) {
 //compares this current list with another input list aList
 //starts from the head and examines every data afterwards
 bool doublylinkedlist::compareList(doublylinkedlist aList){
-	//aList.rearrangeList(0);
-	//rearrangeList(0);
 	node* thisp= head;
 	
     aList.rearrangeList(head->data);
     node* thatp = aList.head;
     
-	if(thisp->data != thatp->data)
-		return false;
+	if(thisp->data != thatp->data){
+        cout<<"returning"<<endl;
+        return false;
+    }
 	thisp = thisp->next;
 	thatp = thatp->next;
 	while(thisp != head && thatp != aList.head) {
 		//cout<<" "<<thisp->data<<" compared to "<<thatp->data<<endl;
-		if(thisp->data != thatp->data)
+		if(thisp->data != thatp->data) {
+            cout<<"returning"<<endl;
 			return false;
+        }
 		thisp = thisp -> next; thatp = thatp -> next;
     }
+    cout<<"returning"<<endl;
     return true;
 }
