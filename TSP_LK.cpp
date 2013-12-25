@@ -428,7 +428,7 @@ doublylinkedlist* starOpt(doublylinkedlist* P, int K,int NUMITERATIONS)
 doublylinkedlist* TwoOpt(doublylinkedlist* Path, int NUMITERATIONS)
 {
     doublylinkedlist* P;
-    int num_nodes = P->countNodes();
+    int num_nodes = Path->countNodes();
     P = copyList(Path, 0, num_nodes-1);
     
     //  cout<<" P has number of nodes = "<<num_nodes<<endl;
@@ -477,7 +477,7 @@ doublylinkedlist* TwoOpt(doublylinkedlist* Path, int NUMITERATIONS)
             tempList->end = tempList->head -> prev;
             
             current_distance = tempList->getDistance();
-            delete tempList;
+           // delete tempList;
             //tempList->~doublylinkedlist();
             
             printf("%d. Trying flip: (%d %d)(%d %d), distance = %f\n",n,temp[0],temp[1],temp[2],temp[3],current_distance);
@@ -493,6 +493,7 @@ doublylinkedlist* TwoOpt(doublylinkedlist* Path, int NUMITERATIONS)
                 //P->~doublylinkedlist();
                 P = copyList(tempList,0,num_nodes-1);
                 cout<<"Display templist: "<<endl;
+                delete tempList;
                 //P.displayforward(); cout<<endl;
                 printf("debug");
                 n = 0;
