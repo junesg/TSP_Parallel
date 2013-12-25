@@ -59,14 +59,11 @@ int main(){
         //now generate a distance matrix
         vector<float> distances;
         for (vector<doublylinkedlist* >::iterator it=group->begin(); it!= group->end(); it++) {
-    //		(*it).displayforward();
-    //		cout<<endl;
-    //		cout<<(*it).getDistance()<<endl;
+            //(*it).displayforward();
+            //cout<<endl;
+            //cout<<(*it).getDistance()<<endl;
             distances.push_back((*it)->getDistance());
         }
-        
-        
-        
         
         cout<<"Distancs has "<<distances.size()<<" elements"<<endl;
         double fitDistance = sortPopDistance(group, &distances,0,distances.size()-1);
@@ -81,10 +78,8 @@ int main(){
          }
             
         
-        //combine for breeding ##############3
-        //NEED TO DO: to select a pair randomly from the top breedProp population.
         
-        PopulationBreeding(group, fitDistance );
+       // PopulationBreeding(group, fitDistance );
 
     }
     
@@ -134,6 +129,7 @@ void PopulationBreeding(std::vector<doublylinkedlist*>* group, double fitDistanc
 		doublylinkedlist *aList = mutate(newlist);	
 		cout<<"After new list###############"<<endl; aList->displayforward(); cout<<endl;
 		cout<<"rand1 = "<<random1<<", rand2 = "<<random2<<" and fit distance = "<< fitDistance<<" mutated distance: "<<newlist->getDistance()<<endl;
+        delete newlist;
 
 		//delete newlist;
 
@@ -152,7 +148,7 @@ void PopulationBreeding(std::vector<doublylinkedlist*>* group, double fitDistanc
 }
 
 
-
+//memory allocation notes: Mutate will always create a new list
 doublylinkedlist* mutate(doublylinkedlist *aList) {
 	//first define number of iterations for twoopt
 	return TwoOpt(aList,MUTATION);

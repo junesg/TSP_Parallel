@@ -424,10 +424,12 @@ doublylinkedlist* starOpt(doublylinkedlist* P, int K,int NUMITERATIONS)
 
 
 //TwoOpt takes in a list, ouputs swapped two nodes (4 edges, 2 adjacent pairs)
-doublylinkedlist* TwoOpt(doublylinkedlist* P, int NUMITERATIONS)
+//Memory Warning: This function always creates a new list, and it will return the newly created one
+doublylinkedlist* TwoOpt(doublylinkedlist* Path, int NUMITERATIONS)
 {
-    //node *p, *p1, *p3, *temp0, *temp1, *temp2, *temp3;
+    doublylinkedlist* P;
     int num_nodes = P->countNodes();
+    P = copyList(Path, 0, num_nodes-1);
     
     //  cout<<" P has number of nodes = "<<num_nodes<<endl;
     P->displayforward(); cout<<endl;
