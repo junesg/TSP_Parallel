@@ -79,7 +79,7 @@ int main(){
             
         
         
-       // PopulationBreeding(group, fitDistance );
+        PopulationBreeding(group, fitDistance );
 
     }
     
@@ -190,7 +190,7 @@ doublylinkedlist* crossOver1(doublylinkedlist* p1,doublylinkedlist* p2){
     t1->displayforward();
     cout<<endl;
 
-	delete t2;
+	//delete t2;
     return t1;
 }
 
