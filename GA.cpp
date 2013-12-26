@@ -98,14 +98,6 @@ int main(){
 
 
 
-/*
-	cout<<"***********"<<endl;
-	for (vector<float>::iterator it=distances.begin(); it!= distances.end(); it++) {
-		cout<<*it<<" ";
-	}
-	*/
-	//Now destroying the group that we have stored.
-	//delete[] group;
 	cout<<endl<<"***********"<<endl;
 
 }
@@ -136,7 +128,8 @@ void PopulationBreeding(std::vector<doublylinkedlist*>* group, double fitDistanc
 		if (aList->getDistance() < fitDistance) { //IF THE OFFSPRING IS SUITED (FIT)
 			//destroy the current worst
 			int size = group->size();
-			delete group->at(breedPop + i);
+			//delete
+            group->at(breedPop + i)->~doublylinkedlist();
 			//add new element to the list
 			group->at(breedPop + i)  = copyList(aList,0,aList->countNodes()-1);
 			//replace the lower ranked population

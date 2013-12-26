@@ -31,12 +31,14 @@ struct Edges //the edges as given by the MST
 class Graph
 {
 public:
-    Graph(std::vector< pair<int, int> > initialsolution, std::vector<std::pair<int,int> > coordinates, string filename);  //constructor: construct graph from the file
+    Graph(std::vector< pair<int, int> > initialsolution, std::vector<std::pair<int,int> > coordinates);
+    //constructor: construct graph from the file
+    
     ~Graph();
 private:
     
-    std::set<Vertices> allVert;
-    std::vector< pair<int, int> > mst_start;
-    std::vector<std::pair<int,int> > coordinates;
+    std::vector<Vertices> allVert;
+    std::vector<Edges> allEdge;
+    
 };
 
