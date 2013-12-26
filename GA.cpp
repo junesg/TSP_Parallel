@@ -78,7 +78,6 @@ int main(){
          }
             
         
-        
         PopulationBreeding(group, fitDistance );
 
     }
@@ -92,6 +91,7 @@ int main(){
 			(*it)->displayforward();
 			cout<<"   with distance: "<<(*it)->getDistance()<<endl;
 	       	cout<<endl;
+           (*it)->~doublylinkedlist();
 	 }
 
    
@@ -190,7 +190,6 @@ doublylinkedlist* crossOver1(doublylinkedlist* p1,doublylinkedlist* p2){
     t1->displayforward();
     cout<<endl;
 
-	//delete t2;
     return t1;
 }
 
@@ -227,48 +226,7 @@ vector<doublylinkedlist*>* GenerateInitPopulation(std::vector< pair<int,int> > c
         }
     }
 	
-    
-    /*
-    for(int j=0 ; j< POPULATION; ){
-		doublylinkedlist* newList;
-		newList = GenerateOneSpecies(coordinates,j, ind); //newly created doublylinkedlist
-		cout<<"#####ind["<<j<<"] is "<<ind[j]<<";"<<endl;
-		newList->rearrangeList(ind[0]); //the index data ==1 node is the start of the list
-		//cout<<"generated: "; newList.displayforward();cout<<endl;
-		bool exists = false;
-		cout<<"&&&&&GENERATED: "; newList->displayforward();cout<<"&&&&&&&&&&&&&"<<endl;
 
-		if(j>0) {
-			for(int i=0; i< j; i++){
-				cout<<"showing population("<<i<<"):"<<endl;
-				population->at(i)->displayforward();
-                (*newList).displayforward();
-                cout<<"TRYING BEFORE FINISHED:"<<endl;
-                bool test = p->compareList(q);
-                q.~doublylinkedlist();
-                
-
-				exists = (exists || test);
-
-				cout<<"Loop2! exist = "<<exists<<endl;
-			}
-		}
-
-		if(!exists) {
-			population->push_back(newList);
-			cout<<"$$$$$$$1$$$$$$$$";
-			newList ->displayforward(); cout<<endl;
-			population->at(j)->displayforward();cout<<"pushed back1"<<endl;
-			cout<<"$$$$$$$2$$$$$$$$  "<<endl;
-			//newList->rearrangeList(0);
-			//newList->displayforward();
-			//cout<<"pushed Backllkk2"<<endl;
-			j++;
-		}
-        cout<<"extra display:";
-		population->at(j-1)->displayforward();
-	}
-    */
     
 	return population;
 }
