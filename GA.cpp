@@ -91,7 +91,8 @@ int main(){
 			(*it)->displayforward();
 			cout<<"   with distance: "<<(*it)->getDistance()<<endl;
 	       	cout<<endl;
-           (*it)->~doublylinkedlist();
+           delete *it;
+          // (*it)->~doublylinkedlist();
 	 }
 
    
@@ -105,7 +106,7 @@ int main(){
 	}
 	*/
 	//Now destroying the group that we have stored.
-	//delete[] group;
+	delete group;
 	cout<<endl<<"***********"<<endl;
 
 }
@@ -136,7 +137,8 @@ void PopulationBreeding(std::vector<doublylinkedlist*>* group, double fitDistanc
 		if (aList->getDistance() < fitDistance) { //IF THE OFFSPRING IS SUITED (FIT)
 			//destroy the current worst
 			int size = group->size();
-			delete group->at(breedPop + i);
+//			delete
+            group->at(breedPop + i)->~doublylinkedlist();
 			//add new element to the list
 			group->at(breedPop + i)  = copyList(aList,0,aList->countNodes()-1);
 			//replace the lower ranked population
@@ -183,13 +185,16 @@ doublylinkedlist* crossOver1(doublylinkedlist* p1,doublylinkedlist* p2){
     cout<<"t2 is now ";
     t2->displayforward();
     cout<<endl;
-
+   // t2 -> ~doublylinkedlist();
+    
+    
     cout<<endl;
     t1->appendList(*t2);
     cout<<"ater appending to t1 : "<<endl;
     t1->displayforward();
     cout<<endl;
 
+    
     return t1;
 }
 
@@ -215,8 +220,8 @@ vector<doublylinkedlist*>* GenerateInitPopulation(std::vector< pair<int,int> > c
             cout<<"***** BEGIN COMPARE*******"<<endl;
             if (population->at(j)->compareList(population->at(i))) {
                 cout<<" already exisits as the "<<j<<"th element"<<endl;
-                delete population->at(i);
-                population->erase(population->begin()+i);
+                population->at(i)->~doublylinkedlist();
+                population->erase(population->begin()+(i-1));
                 repeat = true;
             }
             cout<<"***** AFTER COMPARE*******"<<endl;
@@ -226,7 +231,6 @@ vector<doublylinkedlist*>* GenerateInitPopulation(std::vector< pair<int,int> > c
         }
     }
 	
-
     
 	return population;
 }

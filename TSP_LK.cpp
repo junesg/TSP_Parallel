@@ -493,16 +493,18 @@ doublylinkedlist* TwoOpt(doublylinkedlist* Path, int NUMITERATIONS)
                 //P->~doublylinkedlist();
                 P = copyList(tempList,0,num_nodes-1);
                 cout<<"Display templist: "<<endl;
-                delete tempList;
+                
                 //P.displayforward(); cout<<endl;
                 printf("debug");
                 n = 0;
             } else n++;
+            delete tempList;
         }
+        
     }
+    
     //printf("debugBEST = %f\n",best_distance);
     P->end = P->head ->prev;
-    //P->displayforward();
-    //printf("\n");
+
     return P;
 }
