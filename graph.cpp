@@ -79,7 +79,7 @@ void Graph::DFS(int x, vector<int>* order) {
 
 
 
-
+/*
 
 int main(){
     vector< pair<int, int> > initialsolution;
@@ -113,11 +113,9 @@ int main(){
     }
     
     delete thisGraph;
-    delete order;
-    
-    
+    delete order;   
 }
-
+*/
 
 
 

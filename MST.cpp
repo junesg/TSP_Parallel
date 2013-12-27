@@ -7,17 +7,17 @@
 #include <math.h>
 #include <string.h>
 
+#include "graph.h"  //for constructing the graph
+#include "doublylinked.h" //for constructing a dll as a solution
+#include "DisjointSets.h"  //for MST execution
 
-//#include "doublylinked.h"
-#include "DisjointSets.h"
 
-
-#define DEBUG
+//#define DEBUG
 using namespace std;
 
 void getEdgeWeight(std::vector<double>*, std::vector<std::pair<int,int> >*,std::vector<std::pair<int,int> >*, string);
 void quickSort(double arr[], std::vector<double>*, std::vector<std::pair<int,int> >*, int left, int right);
-void printElementSets(const DisjointSets &s);
+//void printElementSets(const DisjointSets &s);
 std::vector< std::pair<int,int> > kurskalsAlgo(std::vector<double>*, std::vector<std::pair<int,int> >*, std::vector<std::pair<int,int> >*,DisjointSets*);
 
 int main(){
@@ -56,14 +56,42 @@ int main(){
 	std::vector< std::pair<int,int> > mstsolution = kurskalsAlgo(&edgeWeight, &vertexPair, &coordinates, &set);
 
     
+    Graph* solutionGraph = new Graph();
+    vector<int>* order = new vector<int>();
+    solutionGraph->createGraph(mstsolution,coordinates);
+    solutionGraph->DFS(0,order); //starting from the 0th item
     
+    int n = order->size();
+    int xPos[n], yPos[n],ind[n];
+    int count = 0;
+    for (vector<int>::iterator it = order->begin(); it != order->end(); it++) {
+        ind[count] = *it;
+        xPos[count] = coordinates.at(*it).first;
+        yPos[count] = coordinates.at(*it).second;
+        count ++;
+    }
     
-    
-    
+    doublylinkedlist* newDLL = new doublylinkedlist();
+    newDLL->createList(ind, xPos, yPos, n);
+    //Constructed
+    cout<<"SHOW DOUBLYLINKEDLIST: &*********"<<endl;
+    newDLL-> displayforward();
+    cout<<"END SHOW DOUBLYLINKEDLIST: &*********"<<endl;
 
+    
+    
+    delete solutionGraph;
+    delete order;
+    //for now, will pass this out later
+    delete newDLL;
    
 	return 0;
 }
+
+
+
+
+
 
 /*
  * This function takes in
@@ -77,34 +105,34 @@ std::vector< std::pair<int,int> > kurskalsAlgo(std::vector<double>* edgeWeight, 
     //create disjoint set, and use disjoint set to
     
     
-    printElementSets(*set);
+ //   printElementSets(*set);
     
     
 	for (int i=0; i< (*vertexPair).size(); i++) {
         int pair1 =(*vertexPair).at(i).first;
         int pair2 =(*vertexPair).at(i).second;
-#ifdef DEBUG
-        cout<<"pair 1: "<<pair1<<" , pair 2: "<<pair2<<endl;
-#endif
+//#ifdef DEBUG
+//        cout<<"pair 1: "<<pair1<<" , pair 2: "<<pair2<<endl;
+//#endif
         if ((*set).FindSet(pair1) != (*set).FindSet(pair2)) {
-#ifdef DEBUG
-            cout<<"Set Ids: "<<(*set).FindSet(pair1)<<" and "<<(*set).FindSet(pair2)<<endl;
-            cout<<"Num of sets: "<<(*set).NumSets()<<endl;
-#endif
+//#ifdef DEBUG
+//            cout<<"Set Ids: "<<(*set).FindSet(pair1)<<" and "<<(*set).FindSet(pair2)<<endl;
+//            cout<<"Num of sets: "<<(*set).NumSets()<<endl;
+//#endif
             (*set).Union((*set).FindSet(pair1),(*set).FindSet(pair2));
             MSTedges.push_back(pair<int,int> (pair1, pair2));
         }
     }
    
-#ifdef DEBUG
-    printElementSets(*set);
-    for (std::vector<pair<int,int> >::iterator It = MSTedges.begin();
-         It != MSTedges.end(); It++)
-    {
-        cout<<"("<<It->first<<","<<It->second<<")\t";
-        
-    }
-#endif
+//#ifdef DEBUG
+//    printElementSets(*set);
+//    for (std::vector<pair<int,int> >::iterator It = MSTedges.begin();
+//         It != MSTedges.end(); It++)
+//    {
+//        cout<<"("<<It->first<<","<<It->second<<")\t";
+//        
+//    }
+//#endif
     
     
     
@@ -180,9 +208,9 @@ void getEdgeWeight(std::vector<double> *edgeWeight, std::vector<std::pair<int,in
 					pow((*coordinates).at(row).second - (*coordinates).at(col).second,2)));
             //add the pair of vertex to the relative position in vertexPair
 			(*vertexPair).push_back(pair<int,int>(row, col));
-#ifdef DEBUG
-            cout<<"vertex pair insert: ("<<row+1<<","<<col+1<<")"<<endl;
-#endif
+//#ifdef DEBUG
+//            cout<<"vertex pair insert: ("<<row+1<<","<<col+1<<")"<<endl;
+//#endif
         }
     }
 }
@@ -238,13 +266,13 @@ if (i < right)
 
 
 
-
-
-#ifdef DEBUG
-void printElementSets(const DisjointSets & s)
-{
-	for (int i = 0; i < s.NumElements(); ++i)
-		cout << s.FindSet(i) << "  ";
-	cout << endl;
-}
-#endif
+//
+//
+//#ifdef DEBUG
+//void printElementSets(const DisjointSets & s)
+//{
+//	for (int i = 0; i < s.NumElements(); ++i)
+//		cout << s.FindSet(i) << "  ";
+//	cout << endl;
+//}
+//#endif
