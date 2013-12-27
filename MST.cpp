@@ -1,27 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <fstream>
-#include <iostream>
-#include <set>
-#include <queue>
-#include <math.h>
-#include <string.h>
+#include "MST.hpp"
 
-#include "graph.h"  //for constructing the graph
-#include "doublylinked.h" //for constructing a dll as a solution
-#include "DisjointSets.h"  //for MST execution
-
-
-//#define DEBUG
-using namespace std;
-
-void getEdgeWeight(std::vector<double>*, std::vector<std::pair<int,int> >*,std::vector<std::pair<int,int> >*, string);
-void quickSort(double arr[], std::vector<double>*, std::vector<std::pair<int,int> >*, int left, int right);
-//void printElementSets(const DisjointSets &s);
-std::vector< std::pair<int,int> > kurskalsAlgo(std::vector<double>*, std::vector<std::pair<int,int> >*, std::vector<std::pair<int,int> >*,DisjointSets*);
-
-int main(){
-
+doublylinkedlist* DLlFromMST(string filename)
+{
 	std::vector<double> edgeWeight; //edgeWeight is coupled wth the vertexPair function
 	std::vector<std::pair<int,int> > coordinates; //later expanded in getEdgeWeight function
 	std::vector<std::pair<int,int> > vertexPair; //later expanded in getEdgeWeight function
@@ -29,27 +9,9 @@ int main(){
 	
 	getEdgeWeight(&edgeWeight, &coordinates, &vertexPair, filename);
 
-#ifdef DEBUG
-	cout<<"Generated coordinates and edges: "<<endl;
-	for (int i=0; i<edgeWeight.size();i++){
-		cout<<"<"<<vertexPair.at(i).first<<","<<vertexPair.at(i).second<<">  ";
-		cout<<"edgeWegith: "<<edgeWeight.at(i)<<endl;
-	}
-#endif
-
 	//now sort the edgeWeight array
 	double* arr = &edgeWeight[0];
 	quickSort(arr, &edgeWeight, &vertexPair, 0, edgeWeight.size()-1);
-
-
-#ifdef DEBUG
-	cout<<"After sorting: "<<endl;
-	for (int i=0; i<edgeWeight.size();i++){
-		cout<<"<"<<vertexPair.at(i).first<<","<<vertexPair.at(i).second<<">   ";
-		cout<<"edgeWegith: "<<edgeWeight.at(i)<<endl;
-	}
-#endif
-
 
     DisjointSets set((coordinates).size());
     //create a vector of edges for the Kruskal's algorithm
@@ -77,15 +39,11 @@ int main(){
     cout<<"SHOW DOUBLYLINKEDLIST: &*********"<<endl;
     newDLL-> displayforward();
     cout<<"END SHOW DOUBLYLINKEDLIST: &*********"<<endl;
-
-    
     
     delete solutionGraph;
     delete order;
     //for now, will pass this out later
-    delete newDLL;
-   
-	return 0;
+    return newDLL;
 }
 
 
@@ -102,74 +60,20 @@ std::vector< std::pair<int,int> > kurskalsAlgo(std::vector<double>* edgeWeight, 
     std::vector< std::pair<int,int> > MSTedges;
     std::vector< std::pair<int,int> >::iterator MSTIt;
 
-    //create disjoint set, and use disjoint set to
-    
-    
- //   printElementSets(*set);
-    
     
 	for (int i=0; i< (*vertexPair).size(); i++) {
         int pair1 =(*vertexPair).at(i).first;
         int pair2 =(*vertexPair).at(i).second;
-//#ifdef DEBUG
-//        cout<<"pair 1: "<<pair1<<" , pair 2: "<<pair2<<endl;
-//#endif
+
         if ((*set).FindSet(pair1) != (*set).FindSet(pair2)) {
-//#ifdef DEBUG
-//            cout<<"Set Ids: "<<(*set).FindSet(pair1)<<" and "<<(*set).FindSet(pair2)<<endl;
-//            cout<<"Num of sets: "<<(*set).NumSets()<<endl;
-//#endif
+
             (*set).Union((*set).FindSet(pair1),(*set).FindSet(pair2));
             MSTedges.push_back(pair<int,int> (pair1, pair2));
         }
     }
-   
-//#ifdef DEBUG
-//    printElementSets(*set);
-//    for (std::vector<pair<int,int> >::iterator It = MSTedges.begin();
-//         It != MSTedges.end(); It++)
-//    {
-//        cout<<"("<<It->first<<","<<It->second<<")\t";
-//        
-//    }
-//#endif
     
-    
-    
-    
+
     return MSTedges;
-    
-    
-    /*
-    doublylinkedlist<int> aList;
-    int index = 0;
-    int x[1];
-    x[0]=0;
-    //created the first node of the linked list
-    aList.createList(x,1);
-
-    //store the previous finished linked list
-    int tempInd = 0;
-    
-    for (index = 1; index < (*coordinates).size(); index++) {
-        for (MSTIt = MSTedges.begin(); MSTIt!=MSTedges.end(); MSTIt++) {
-            if (MSTIt->first == tempInd) {
-                aList.insertAfter(MSTIt->second,tempInd);
-                tempInd =MSTIt->second;
-            }
-            if (MSTIt->second == tempInd) {
-                aList.insertAfter(MSTIt->first,tempInd);
-                tempInd =MSTIt->second;
-            }
-        
-        }
-    }
-   
-#ifdef DEBUG
-    aList.displayforward();
-#endif
-     */
-
 }
 
 
@@ -208,9 +112,6 @@ void getEdgeWeight(std::vector<double> *edgeWeight, std::vector<std::pair<int,in
 					pow((*coordinates).at(row).second - (*coordinates).at(col).second,2)));
             //add the pair of vertex to the relative position in vertexPair
 			(*vertexPair).push_back(pair<int,int>(row, col));
-//#ifdef DEBUG
-//            cout<<"vertex pair insert: ("<<row+1<<","<<col+1<<")"<<endl;
-//#endif
         }
     }
 }
@@ -263,16 +164,3 @@ if (i < right)
    quickSort(arr, edgeWeight,  vertexPair, i, right);
 }
 
-
-
-
-//
-//
-//#ifdef DEBUG
-//void printElementSets(const DisjointSets & s)
-//{
-//	for (int i = 0; i < s.NumElements(); ++i)
-//		cout << s.FindSet(i) << "  ";
-//	cout << endl;
-//}
-//#endif
