@@ -1,9 +1,9 @@
 /*
  *  MemeticMPI.c
  *
- *
  *  Created by Yuan Shangguan
- *  Copyright 2013 University of Michigan Ann Arbor. All rights reserved.
+ *  Copyright 2013 
+ *  University of Michigan Ann Arbor. All rights reserved.
  *
  */
 
@@ -12,23 +12,19 @@
 #include <stdlib.h>
 #include <stdbool.h> // for boolean
 
-
-//#define DEBUG
 #define MessageTag 1
 #define SumTag 2
 
 
 int main(int argc, char** argv) {
 	/* Initialize MPI environment */
-	int n = 1000;//the side length of the matrix
 	int ITERATION = 1000;//number of iterations
 	int iteration;
-	//Assign size of the matrix
+	/* Assign size of the matrix */
     int world_size;		//equivalent to p
 	int rankWorld;		//same as the id of the processor
-	int numOfCol;		//number of columns in processor rankWorld
-	int numOfElement;	//number of elements in processor rankWorld
 	double t1,t2;      //start time and end time
+    
 	MPI_Init(&argc, &argv);
 	MPI_Comm_size(MPI_COMM_WORLD, &world_size); //get the size of the world
 	MPI_Comm_rank(MPI_COMM_WORLD, &rankWorld);//get the rank of this processor
@@ -147,113 +143,3 @@ int main(int argc, char** argv) {
     
 }
 
-/*
- * This function takes in the ghost column and computes the updated column elements within the processor
- */
-void updateMatrixElement(int numOfCol, double bufferIn[], double element[], int n, int rankWorld, int world_size){
-	// declare a pointer variable to point to allocated heap space
-	double *elementCopy;
-	elementCopy = (double *)malloc(sizeof(double)*(n*numOfCol));  // allocate n*numOfCol doubles
-	int i;
-	int size;
-    
-	//update each term in the matrix, and store updated values into elementCopy
-	for (i =0; i< n*numOfCol; i++) {
-		int globalCoords[2];
-		elementIndexToGlobalPosition(globalCoords, rankWorld, i ,n, numOfCol,world_size);
-		//if its global index A(i,j), i=j or j =n-1
-		if (globalCoords[0] == globalCoords[1] || globalCoords[1] == n-1) {
-			elementCopy[i] = element[i];//original value is restored
-		}
-		
-		//if nothing of the above is matching, then we use the matrix updating mechanism
-		else {
-			int k ;
-			double up, down,right;
-			//first, if the element does not belong to the first row or the last row or the last column,
-			//then this element will be updated with internal elements
-			if (globalCoords[0]<n-1) {
-				down = fabs(element[i+numOfCol]);
-			}
-			if (globalCoords[0]>0) {
-				up = fabs(element[i-numOfCol]);
-			}
-			if ((i+1)%numOfCol != 0){
-				right = fabs(element[i+1]);
-			}
-			//if i belongs to the first row
-			if (globalCoords[0] == 0) {
-				up = fabs(element[i+(n-1)*numOfCol]);
-			}
-			//if i belongs to the last row
-			if (globalCoords[0] == n-1){
-				down = fabs(element[i-(n-1)*numOfCol]);
-			}
-			if ((i+1)%numOfCol == 0 && globalCoords[1]!=n-1) {
-				int bufferId = floor ((double) i/(double)numOfCol);
-				right = fabs(bufferIn[bufferId]);
-			}
-            
-			elementCopy[i] = 0;
-			//do the algorithm of summation with right, up and down values
-			for (k = 1; k <11; k++) {
-				elementCopy[i] += pow(down,1.0/(double)k) -pow(up,1.0/(double)k)*pow(right,1.0/(double)(k+1));
-                
-			}
-			
-			
-			if (elementCopy[i] >= 10) {
-				elementCopy[i] = 10;
-			}
-			if (elementCopy[i] <= -10) {
-				elementCopy[i] =-10;
-			}
-			
-		}
-        
-	}
-	
-	//after update, we store the values back to element
-	for (i=0; i< n*numOfCol; i++) {
-		element[i] = elementCopy[i];
-	}
-	free(elementCopy);
-	
-}
-
-
-
-
-/*
- * This function transforms the elementID of the unit in the array of values stored in the processor to the global
- * matrix position (i,j) cooridnate.
- */
-void elementIndexToGlobalPosition(int globalCoords[], int rankWorld, int elementId, int n, int numOfCol, int world_size) {
-	
-	int Col = ceil(rankWorld*(double)n/(double)world_size);//current very first column of this processor
-	int addCol = elementId%numOfCol; //which column the current element is
-	int Row = floor((double)elementId/(double)numOfCol);
-	Col += addCol;
-	
-	//Check for system errors
-	if (Row > n || Col > n) {
-		printf("System Error\n");
-		printf("**-------------\n");
-		printf("Row is %d, Col is %d\n",Row, Col);
-		printf("**-------------\n");
-		exit(EXIT_FAILURE);
-	}
-	
-	//assign value to global coordinates
-	globalCoords[0] = Row;
-	globalCoords[1] = Col;
-}
-
-
-/*
- * This function tests whether a given int is a perfect square.
- */
-bool testSquare(int world_size) {
-	double d_square = sqrt(world_size);
-	return (world_size ==((int)d_square)*((int)d_square));
-}

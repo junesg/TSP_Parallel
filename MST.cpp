@@ -1,6 +1,6 @@
 #include "MST.hpp"
 
-doublylinkedlist* DLlFromMST(string filename)
+doublylinkedlist* DLLFromMST(string filename)
 {
 	std::vector<double> edgeWeight; //edgeWeight is coupled wth the vertexPair function
 	std::vector<std::pair<int,int> > coordinates; //later expanded in getEdgeWeight function
