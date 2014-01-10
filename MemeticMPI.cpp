@@ -11,7 +11,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
+<<<<<<< HEAD
 #include <iostream>
+=======
+>>>>>>> bba3fe97610c2f33050aad4636e75b8d959918f3
 #include <iterator>
 //#include <stdbool.h> // for boolean
 #include "doublylinked.h"
@@ -52,6 +55,7 @@ int main(int argc, char** argv)
     /* method: 0: MST, 1:GA, 2:TwoOpt, 3:RayOpt, 4:KL, 5:StarOpt */
     MethodSequence->push_back(rankWorld%6); //initialize a single method
     
+<<<<<<< HEAD
     singleRoundImprovement(solutionDLL, MethodSequence);
     
     
@@ -61,6 +65,26 @@ int main(int argc, char** argv)
     //update solution ? --> maybe only MST
     
     //repeat the loop till converge --> convergence criteria
+=======
+    /*
+     * Generate initial Method selection and number of iterations
+     */
+    //Initial Sequence matrix
+    int Sequence[6] = {0,1,2,3,4,5};
+    Sequence = random_shuffle(Sequence.begin(), Sequence.end());
+    //debug:
+    printf("sequence");
+    for (int i =0 ; i <6 ; i++) {
+        printf("%d", Sequence[i]);
+    }
+    //frequency matrix
+    int Frequency[6] = {0,0,0,0,0,0}
+    Frequency(randWorld) = 1;
+    printf("frequency");
+    for (int i =0 ; i <6 ; i++) {
+        printf("%d", Frequency[i]);
+    }
+>>>>>>> bba3fe97610c2f33050aad4636e75b8d959918f3
     
     
     
