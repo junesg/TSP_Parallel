@@ -438,6 +438,7 @@ doublylinkedlist* TwoOpt(doublylinkedlist* Path, int NUMITERATIONS)
     int temp[4];
     float current_distance = 0;
     float best_distance = P->getDistance();
+	//start a history records of which pair 
     vector<vector<int> > pairs;
     doublylinkedlist* tempList;
     //tempList= new doublylinkedlist();
@@ -447,8 +448,8 @@ doublylinkedlist* TwoOpt(doublylinkedlist* Path, int NUMITERATIONS)
         flag = 0;
         
         temp[0] = rand() % num_nodes ;
-        cout<<"temp0 is "<<temp[0];
-        cout<<"number of nodes: "<<num_nodes<<endl;
+    /*  cout<<"temp0 is "<<temp[0];
+        cout<<"number of nodes: "<<num_nodes<<endl; */
         
         temp[1] = P->getNextIndex(temp[0]); //PROBLEM
         temp[2] = rand() % num_nodes ;

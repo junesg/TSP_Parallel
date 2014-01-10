@@ -20,6 +20,9 @@
 ### Two-Opt
 
 
-ray opt 
-KL
-star opt
+### Ray opt 
+
+
+### KL
+
+### Star opt
