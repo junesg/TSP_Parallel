@@ -1,22 +1,30 @@
 #include "GA.hpp"
 
 //Overal GA function
-int main(){
+//int main(){
+//
+//	int ind[LISTSIZE] = {0,1,2,3,4,5,6,7,8,9};
+//    int x[LISTSIZE]   = {0,0,1,1,2,2,4,2,1,5};
+//    int y[LISTSIZE]   = {10,0,10,0,10,0,5,6,7,3};
+//
+//	int n=LISTSIZE; //test population size
+//	std::vector<pair<int,int> > coordinates;
+//	for(int i = 0; i<n; i++) {
+//		coordinates.push_back(pair<int,int>(x[i],y[i]));
+//	}
+//	
+//	
+//	cout<<"Coordinates size = "<<coordinates.size()<<endl;	
 
-	int ind[LISTSIZE] = {0,1,2,3,4,5,6,7,8,9};
-    int x[LISTSIZE]   = {0,0,1,1,2,2,4,2,1,5};
-    int y[LISTSIZE]   = {10,0,10,0,10,0,5,6,7,3};
-
-	int n=LISTSIZE; //test population size
-	std::vector<pair<int,int> > coordinates;
-	for(int i = 0; i<n; i++) {
-		coordinates.push_back(pair<int,int>(x[i],y[i]));
-	}
-	
-	
-	cout<<"Coordinates size = "<<coordinates.size()<<endl;	
-
+vector<doublylinkedlist*>* GA_function(vector<pair<int,int> > coordinates){
 	vector<doublylinkedlist*>* group;
+    
+    int n_size = coordinates.size();
+    int ind[n_size];
+    for (int i=0; i<n_size; i++) {
+        ind[i]=i;
+    }
+    
 	group =  GenerateInitPopulation(coordinates,ind);
 	
     cout<<"FINISH GENERATION"<<endl;
@@ -77,8 +85,8 @@ int main(){
 	}
 	*/
 	//Now destroying the group that we have stored.
-	delete group;
-	cout<<endl<<"***********"<<endl;
+	return group;
+//	cout<<endl<<"***********"<<endl;
 
 }
 
@@ -202,7 +210,6 @@ vector<doublylinkedlist*>* GenerateInitPopulation(std::vector< pair<int,int> > c
         }
     }
 	
-    
 	return population;
 }
 

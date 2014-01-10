@@ -26,3 +26,12 @@
 ### KL
 
 ### Star opt
+
+
+
+
+###MemeticMPI.cpp (overarching mpi file regulating the parallel behavior)
+*** compiler
+mpic++ MemeticMPI.cpp doublylinked.cpp MST.cpp GA.cpp graph.cpp TSP_LK.cpp DisjointSets.cpp
+*** running
+mpirun -np <number of processes> <program name and arguments>

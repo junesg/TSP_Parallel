@@ -23,6 +23,7 @@
 
 
 using namespace std;
+vector<doublylinkedlist*>* GA_function(vector<pair<int,int> > coordinates);
 
 doublylinkedlist* crossOver1(doublylinkedlist *p1,doublylinkedlist* p2);
 doublylinkedlist* GenerateOneSpecies(std::vector<pair<int,int> > coordinates,int seed, int* ind);
