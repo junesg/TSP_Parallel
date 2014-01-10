@@ -11,7 +11,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
-#include <stdbool.h> // for boolean
+//#include <stdbool.h> // for boolean
+#include "doublylinked.h"
+#include "MST.hpp"
+#include "GA.hpp"
+#include "TSP_LK.h"
 
 #define MessageTag 1
 #define SumTag 2
