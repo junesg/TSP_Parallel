@@ -10,11 +10,12 @@
 #include "mpi.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <vector>
 #include <stdbool.h> // for boolean
 
 #define MessageTag 1
 #define SumTag 2
-
+using namespace std;
 
 int main(int argc, char** argv) {
 	/* Initialize MPI environment */
@@ -36,9 +37,9 @@ int main(int argc, char** argv) {
      * Prepare initial condition of the problem
      */
     //First read in the problem
-    std::vector<double> edgeWeight; //edgeWeight is coupled wth the vertexPair function
-	std::vector<std::pair<int,int> > coordinates; //later expanded in getEdgeWeight function
-	std::vector<std::pair<int,int> > vertexPair; //later expanded in getEdgeWeight function
+    vector<double> edgeWeight; //edgeWeight is coupled wth the vertexPair function
+	vector<std::pair<int,int> > coordinates; //later expanded in getEdgeWeight function
+	vector<std::pair<int,int> > vertexPair; //later expanded in getEdgeWeight function
     string filename = "testDist.txt"; //Give the problem a file name, the file has o be in the same folder as the code
 
     getEdgeWeight(&edgeWeight, &coordinates, &vertexPair, filename);
