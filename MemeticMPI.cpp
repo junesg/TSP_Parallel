@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
+#include <iterator>
 //#include <stdbool.h> // for boolean
 #include "doublylinked.h"
 #include "MST.hpp"
@@ -67,19 +68,19 @@ int main(int argc, char** argv) {
      * Generate initial Method selection and number of iterations
      */
     //Initial Sequence matrix
-    int[6] Sequence = {0,1,2,3,4,5};
+    int Sequence[6] = {0,1,2,3,4,5};
     Sequence = random_shuffle(Sequence.begin(), Sequence.end());
     //debug:
     printf("sequence");
     for (int i =0 ; i <6 ; i++) {
-        printf('%d', Sequence[i]);
+        printf("%d", Sequence[i]);
     }
     //frequency matrix
-    int[6] Frequency = {0,0,0,0,0,0}
+    int Frequency[6] = {0,0,0,0,0,0}
     Frequency(randWorld) = 1;
     printf("frequency");
     for (int i =0 ; i <6 ; i++) {
-        printf('%d', Frequency[i]);
+        printf("%d", Frequency[i]);
     }
     
     
