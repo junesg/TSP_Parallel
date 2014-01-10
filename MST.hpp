@@ -21,7 +21,6 @@ using namespace std;
 void getEdgeWeight(std::vector<double>*, std::vector<std::pair<int,int> >*,std::vector<std::pair<int,int> >*, string);
 void quickSort(double arr[], std::vector<double>*, std::vector<std::pair<int,int> >*, int left, int right);
 std::vector< std::pair<int,int> > kurskalsAlgo(std::vector<double>*, std::vector<std::pair<int,int> >*, std::vector<std::pair<int,int> >*,DisjointSets*);
-doublylinkedlist* DLLFromMST(string filename);
-
+doublylinkedlist* DLLFromMST(std::vector<double> edgeWeight,std::vector<std::pair<int,int> > coordinates, std::vector<std::pair<int,int> > vertexPair );
 
 #endif

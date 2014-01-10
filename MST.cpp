@@ -1,13 +1,7 @@
 #include "MST.hpp"
 
-doublylinkedlist* DLLFromMST(string filename)
+doublylinkedlist* DLLFromMST(std::vector<double> edgeWeight,std::vector<std::pair<int,int> > coordinates, std::vector<std::pair<int,int> > vertexPair )
 {
-	std::vector<double> edgeWeight; //edgeWeight is coupled wth the vertexPair function
-	std::vector<std::pair<int,int> > coordinates; //later expanded in getEdgeWeight function
-	std::vector<std::pair<int,int> > vertexPair; //later expanded in getEdgeWeight function
-	string filename = "testDist.txt";
-	
-	getEdgeWeight(&edgeWeight, &coordinates, &vertexPair, filename);
 
 	//now sort the edgeWeight array
 	double* arr = &edgeWeight[0];
@@ -36,13 +30,14 @@ doublylinkedlist* DLLFromMST(string filename)
     doublylinkedlist* newDLL = new doublylinkedlist();
     newDLL->createList(ind, xPos, yPos, n);
     //Constructed
+    /*
     cout<<"SHOW DOUBLYLINKEDLIST: &*********"<<endl;
     newDLL-> displayforward();
     cout<<"END SHOW DOUBLYLINKEDLIST: &*********"<<endl;
+    */
     
     delete solutionGraph;
     delete order;
-    //for now, will pass this out later
     return newDLL;
 }
 
@@ -115,11 +110,6 @@ void getEdgeWeight(std::vector<double> *edgeWeight, std::vector<std::pair<int,in
         }
     }
 }
-
-
-
-
-
 
 
 

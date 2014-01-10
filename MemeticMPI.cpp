@@ -31,35 +31,60 @@ int main(int argc, char** argv) {
 	MPI_Status status;
 	MPI_Request request;
 	
-	
-	/* Check for input parameters */
-	//test if the world_size is a perfect square
-	if (!testSquare(world_size)){
-		if (rankWorld ==0 ) {
-			printf("Please Try Again With a Perfect Square Number of Processors\n");
-		}
-		MPI_Abort(MPI_COMM_WORLD, 1);
-		exit(EXIT_FAILURE);
-	}
-	//test if the matrix size (n*n) is smaller than the number of processors.
-	else if(n < world_size) {
-		if (rankWorld ==0) {
-			printf("The processor number is too big (>n) and it is not considered for this assignment, aborted\n");
-		}
-		MPI_Abort(MPI_COMM_WORLD,1);
-		exit(EXIT_FAILURE);
-	}
-	
+
+    /*
+     * Prepare initial condition of the problem
+     */
+    //First read in the problem
+    std::vector<double> edgeWeight; //edgeWeight is coupled wth the vertexPair function
+	std::vector<std::pair<int,int> > coordinates; //later expanded in getEdgeWeight function
+	std::vector<std::pair<int,int> > vertexPair; //later expanded in getEdgeWeight function
+    string filename = "testDist.txt"; //Give the problem a file name, the file has o be in the same folder as the code
+
+    getEdgeWeight(&edgeWeight, &coordinates, &vertexPair, filename);
     
-	/*Find the number of elements to be stored in the processor the values in the processor is here */
-	//step one, how many values are there in this processor
-	numOfCol = ceil((rankWorld+1)*(double)n/(double)world_size)-1-ceil(rankWorld*(double)n/(double)world_size)+1;
-	numOfElement = n*numOfCol;
-	/*declare initial values*/
-	double *elements;
-	elements = (double *)malloc(sizeof(double)*(numOfElement));  // allocate n*numOfCol doubles
-	
-	
+    int n = coordinates.size();
+    int xPos[n], yPos[n],ind[n];
+    int count = 0;
+    for (vector<int>::iterator it = coordinates.begin(); it != coordinates.end(); it++) {
+        ind[count] = count;
+        xPos[count] = (*it).first;
+        yPos[count] = (*it).second;
+        count ++;
+    }
+    
+    //finished initializing the element of doublylinkedlist
+    doublylinkedlist* newDLL = new doublylinkedlist();
+    newDLL->createList(ind, xPos, yPos, n);
+    
+    
+    /*
+     * Generate initial Method selection and number of iterations
+     */
+    //Initial Sequence matrix
+    int[6] Sequence = {0,1,2,3,4,5};
+    Sequence = random_shuffle(Sequence.begin(), Sequence.end());
+    //debug:
+    printf('sequence');
+    for (int i =0 ; i <6 ; i++) {
+        printf('%d', Sequence[i]);
+    }
+    //frequency matrix
+    int[6] Frequency = {0,0,0,0,0,0}
+    Frequency(randWorld) = 1;
+    printf('frequency');
+    for (int i =0 ; i <6 ; i++) {
+        printf('%d', Frequency[i]);
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
 	//initialize elements
 	int iter;
 	for (iter = 0; iter < numOfElement; iter ++) {
