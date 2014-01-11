@@ -35,3 +35,8 @@
 mpic++ MemeticMPI.cpp doublylinked.cpp MST.cpp GA.cpp graph.cpp TSP_LK.cpp DisjointSets.cpp
 *** running
 mpirun -np <number of processes> <program name and arguments>
+
+
+
+TODOS:
+when the np is smaller than 6, we need to find a way to loop through all methods before starting to let the parallel system migrate

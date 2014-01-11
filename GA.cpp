@@ -1,23 +1,10 @@
 #include "GA.hpp"
 
-//Overal GA function
-//int main(){
-//
-//	int ind[LISTSIZE] = {0,1,2,3,4,5,6,7,8,9};
-//    int x[LISTSIZE]   = {0,0,1,1,2,2,4,2,1,5};
-//    int y[LISTSIZE]   = {10,0,10,0,10,0,5,6,7,3};
-//
-//	int n=LISTSIZE; //test population size
-//	std::vector<pair<int,int> > coordinates;
-//	for(int i = 0; i<n; i++) {
-//		coordinates.push_back(pair<int,int>(x[i],y[i]));
-//	}
-//	
-//	
-//	cout<<"Coordinates size = "<<coordinates.size()<<endl;	
 
-vector<doublylinkedlist*>* GA_function(vector<pair<int,int> > coordinates){
-	vector<doublylinkedlist*>* group;
+
+vector<doublylinkedlist*>* GA_produceGroup(vector<pair<int,int> > coordinates){
+    
+    vector<doublylinkedlist*>* group;
     
     int n_size = coordinates.size();
     int ind[n_size];
@@ -26,21 +13,19 @@ vector<doublylinkedlist*>* GA_function(vector<pair<int,int> > coordinates){
     }
     
 	group =  GenerateInitPopulation(coordinates,ind);
-	
-    cout<<"FINISH GENERATION"<<endl;
-	
+
+    return group;
+}
+
+
+vector<doublylinkedlist*>* GA_function(vector<doublylinkedlist*>* group, int numberOfIteration){
+		
     //DEFINE CONVERGENCE
-    
-    int numberOfIteration = 10;
-    
     while (numberOfIteration > 0) {
         numberOfIteration --;
         //now generate a distance matrix
         vector<float> distances;
         for (vector<doublylinkedlist* >::iterator it=group->begin(); it!= group->end(); it++) {
-            //(*it).displayforward();
-            //cout<<endl;
-            //cout<<(*it).getDistance()<<endl;
             distances.push_back((*it)->getDistance());
         }
         
@@ -55,39 +40,21 @@ vector<doublylinkedlist*>* GA_function(vector<pair<int,int> > coordinates){
              cout<<"   with distance: "<<(*it)->getDistance()<<endl;
              cout<<endl;
          }
-            
-        
         PopulationBreeding(group, fitDistance );
-
     }
     
-    
-    
-    
-	//cout<<endl<<" ****** After one round of breeding"<<endl;
-	  for (vector<doublylinkedlist *>::iterator it=group->begin(); it!= group->end(); it++) {
-			(*it)->rearrangeList(0);	       		       	
-			(*it)->displayforward();
-			cout<<"   with distance: "<<(*it)->getDistance()<<endl;
-	       	cout<<endl;
-           delete *it;
-          // (*it)->~doublylinkedlist();
-	 }
-
-   
-
-
-
+    return group;
 /*
-	cout<<"***********"<<endl;
-	for (vector<float>::iterator it=distances.begin(); it!= distances.end(); it++) {
-		cout<<*it<<" ";
-	}
-	*/
-	//Now destroying the group that we have stored.
-	return group;
-//	cout<<endl<<"***********"<<endl;
-
+//	//cout<<endl<<" ****** After one round of breeding"<<endl;
+//	  for (vector<doublylinkedlist *>::iterator it=group->begin(); it!= group->end(); it++) {
+//			(*it)->rearrangeList(0);	       		       	
+//			(*it)->displayforward();
+//			cout<<"   with distance: "<<(*it)->getDistance()<<endl;
+//	       	cout<<endl;
+//           delete *it;
+//          // (*it)->~doublylinkedlist();
+//	 }
+ */
 }
 
 
@@ -295,7 +262,7 @@ if(breedPop > POPULATION) {
 
 
 
-
+//end of file
 
 
 
