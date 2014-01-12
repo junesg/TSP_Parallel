@@ -25,9 +25,10 @@
 #define ITERATION 1000
 using namespace std;
 
-void printArray (int arr[], int n);
-void randomize ( int arr[], int n);
-void swap (int *a, int *b);
+double singleRoundImprovement(doublylinkedlist* solutionDLL, 
+			int methodCode, string filename,vector<doublylinkedlist*>* groupGA, 
+			vector<double> *edgeWeight, vector<std::pair<int,int> > *coordinates, 
+			vector<std::pair<int,int> > vertexPair);
 
 
 
@@ -46,6 +47,12 @@ int main(int argc, char** argv)
     vector<int> MethodSequence;
     vector<int> MethodIteration;
     vector<doublylinkedlist*>* groupGA;
+    //initialize parameters to store the problem
+    std::vector<double> *edgeWeight;
+	std::vector<std::pair<int,int> > *coordinates;
+	std::vector<std::pair<int,int> > *vertexPair;
+  	getEdgeWeight(edgeWeight, coordinates, vertexPair, filename); //function in MST.cpp, puts value into these variables
+    
     
     /* Initializing the solution */
     string filename = "testDist.txt";
@@ -67,7 +74,7 @@ int main(int argc, char** argv)
         for (int iter = 0; iter < MethodIteration->at(method); iter++) {
             //do the work
             int methodCode = MethodSequence->at(method);
-            singleRoundImrovement(solutionDLL, methodCode, filename,groupGA);
+            singleRoundImrovement(solutionDLL, methodCode, filename,groupGA,edgeWeight, coordinates, vertexPair);
             
        
         
@@ -102,35 +109,55 @@ int main(int argc, char** argv)
 
 //for each round, we use the method as presented in the method Sequence vector
 //Each method loops through method iterations
-void singleRoundImprovement(doublylinkedlist* solutionDLL, int methodCode, string filename,vector<doublylinkedlist*>* groupGA)
-{
-    
+double singleRoundImprovement(doublylinkedlist* solutionDLL, 
+			int methodCode, string filename,vector<doublylinkedlist*>* groupGA, 
+			vector<double> *edgeWeight, vector<std::pair<int,int> > *coordinates, 
+			vector<std::pair<int,int> > vertexPair) {
+
+    double convergence;
+ 	doublylinkedlist* newSolution;
+ 	int NUMITERATIONS = 10; /**This number is changeable**/
+ 	
+	/* switch method to run the method for only once */
     switch (methodCode) {
         case 0: //the MST method
-            <#statements#>
+            newSolution= DLLFromMST(edgeWeight, coordinates, vertexPair );
+            //MST solution is unique, so we will preserve the new solution if it is better
             break;
         
         case 1: //the GA method
+            if(groupGA->isEmpty()) { //if the group is empty 
+         		groupGA = GA_produceGroup(coordinates); //initial population is created
+            } 
+            groupGA =  GA_function(groupGA, 1);//one iterations of breeding only
+            newSolution = groupGA->at(0);
+            break;
+            
+        case 2://the 2opt method
+            newSolution  = TwoOpt(solutionDLL, NUMITERATIONS);
+            break;
+            
+        case 3: //the ray-opt method
+            newSolution  = rayOpt(solutionDLL, NUMITERATIONS);
+            break;
+        case 4://LK
             
             break;
-        case 2:
+        case 5://Star Opt 
             
             break;
-        case 3:
             
-            break;
-        case 4:
-            
-            break;
-        case 5:
-            
-            break;
         default:
+        
             break;
     }
     
-    
-    
+    double convergence = solutionDLL->getDistance() - newSolution->getDistance();
+    if (convergence >= 0){ //if the appointed method produces solution that has better path
+        solutionDLL->~doublylinkedlist();
+        solutionDLL = newSolution;
+    }
+    return convergence;
     
 }
 

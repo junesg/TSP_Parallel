@@ -443,7 +443,7 @@ doublylinkedlist* TwoOpt(doublylinkedlist* Path, int NUMITERATIONS)
     doublylinkedlist* tempList;
     //tempList= new doublylinkedlist();
     
-    while (n < NUMITERATIONS && n < num_nodes*(num_nodes-3)/2) {
+    while (n < NUMITERATIONS && n < num_nodes*(num_nodes-3)/2) { //
         // Get pairs
         flag = 0;
         

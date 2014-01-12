@@ -33,16 +33,17 @@ vector<doublylinkedlist*>* GA_function(vector<doublylinkedlist*>* group, int num
         double fitDistance = sortPopDistance(group, &distances,0,distances.size()-1);
         cout<<"fit Distance: "<<fitDistance<<endl;
 
+/*
         for (vector<doublylinkedlist* >::iterator it=group->begin(); it!= group->end(); it++)
         {
              (*it)->rearrangeList(0);
              (*it)->displayforward();
-             cout<<"   with distance: "<<(*it)->getDistance()<<endl;
-             cout<<endl;
+             //cout<<"   with distance: "<<(*it)->getDistance()<<endl;
+             //cout<<endl;
          }
+         */
         PopulationBreeding(group, fitDistance );
     }
-    
     return group;
 /*
 //	//cout<<endl<<" ****** After one round of breeding"<<endl;
@@ -93,6 +94,13 @@ void PopulationBreeding(std::vector<doublylinkedlist*>* group, double fitDistanc
 		}
         delete aList;
 	}
+	
+	//after breeding, the group is again arranged according to the population distances
+	vector<float> distances;
+    for (vector<doublylinkedlist* >::iterator it=group->begin(); it!= group->end(); it++) {
+        distances.push_back((*it)->getDistance());
+    }
+	sortPopDistance(group, &distances,0,distances.size()-1);
 }
 
 
