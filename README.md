@@ -40,3 +40,7 @@ mpirun -np <number of processes> <program name and arguments>
 
 TODOS:
 when the np is smaller than 6, we need to find a way to loop through all methods before starting to let the parallel system migrate
+
+
+
+MPI: to prevent usage of too much RAM we don't want to send too many messages before posting receives. we also don't want the slowest processor to get jammed. 

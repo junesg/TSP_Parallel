@@ -13,7 +13,6 @@
 #include <vector>
 #include <iostream>
 #include <iterator>
-//#include <stdbool.h> // for boolean
 #include "doublylinked.h"
 #include "MST.hpp"
 #include "GA.hpp"
@@ -22,7 +21,9 @@
 
 #define MessageTag 1
 #define SumTag 2
-#define ITERATION 10
+#define ITERATION 100 //each round of individual island development, we have this number of iterations
+#define MEMETICFREQUENCY 2 //after every ITERATION time, the processor send out to this number of other processors
+
 using namespace std;
 
 double singleRoundImprovement(doublylinkedlist* solutionDLL, 
@@ -44,6 +45,7 @@ int main(int argc, char** argv)
     //get the size of the world, find out how many processors are executing at the same time
     MPI_Comm_size(MPI_COMM_WORLD, &sizeWorld);
     
+
     vector<int> MethodSequence;
     vector<int> MethodIteration;
     vector<doublylinkedlist*>* groupGA;
@@ -67,24 +69,36 @@ int main(int argc, char** argv)
     }
 
     
+    
+    //what happens here will be for the slave.
+    
     /* start the loop of work */
 	for(int method=0; method < MethodSequence->size(); method++){
         for (int iter = 0; iter < MethodIteration->at(method); iter++) {
             //do the work
+            double oldDist = solutionDLL-> getDistance();
             int methodCode = MethodSequence->at(method);
-            double convergence = singleRoundImrovement(solutionDLL, 
+            singleRoundImrovement(solutionDLL, 
             								methodCode, 
             								filename,
             								groupGA,
             								edgeWeight, 
-            								coordinates, vertexPair);        
+            								coordinates, vertexPair);    
     	}		
 	}
+	double newDist = solutionDLL-> getDistance();
+	double convergence = (newDist- oldDist)/oldDist;
 	
 	
+	int sizeOfMessage = 
+	int *scount = 
 	
-	
-    //we then send communication between the processors
+    //we then send communication to the zeroth the processors
+    
+    
+    
+    
+    
     //update method
     //update solution ? --> maybe only MST
     
@@ -109,11 +123,10 @@ int main(int argc, char** argv)
 
 //for each round, we use the method as presented in the method Sequence vector
 //Each method loops through method iterations
-double singleRoundImprovement(doublylinkedlist* solutionDLL, 
+void singleRoundImprovement(doublylinkedlist* solutionDLL, 
 			int methodCode, string filename,vector<doublylinkedlist*>* groupGA, 
 			vector<double> *edgeWeight, vector<std::pair<int,int> > *coordinates, 
 			vector<std::pair<int,int> > vertexPair) {
-
     double convergence;
  	doublylinkedlist* newSolution;
  	int NUMITERATIONS = 100; /**This number is changeable**/
@@ -160,7 +173,7 @@ double singleRoundImprovement(doublylinkedlist* solutionDLL,
         solutionDLL->~doublylinkedlist();
         solutionDLL = newSolution;
     }
-    return convergence;
+    return;
 }
 
 
