@@ -33,9 +33,7 @@ static void master(void)
                  MPI_COMM_WORLD);   /* default communicator */
     }
     
-    
-    
-    
+
     /* Loop over getting new work requests until there is no more work
      to be done */
     

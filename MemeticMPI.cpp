@@ -22,7 +22,7 @@
 
 #define MessageTag 1
 #define SumTag 2
-#define ITERATION 1000
+#define ITERATION 10
 using namespace std;
 
 double singleRoundImprovement(doublylinkedlist* solutionDLL, 
@@ -67,22 +67,23 @@ int main(int argc, char** argv)
     }
 
     
-    
-
     /* start the loop of work */
-	for(int method=0; method<MethodSequence->size(); method++){
+	for(int method=0; method < MethodSequence->size(); method++){
         for (int iter = 0; iter < MethodIteration->at(method); iter++) {
             //do the work
             int methodCode = MethodSequence->at(method);
-            singleRoundImrovement(solutionDLL, methodCode, filename,groupGA,edgeWeight, coordinates, vertexPair);
-            
-       
-        
-    		}		
+            double convergence = singleRoundImrovement(solutionDLL, 
+            								methodCode, 
+            								filename,
+            								groupGA,
+            								edgeWeight, 
+            								coordinates, vertexPair);        
+    	}		
 	}
-
 	
-    
+	
+	
+	
     //we then send communication between the processors
     //update method
     //update solution ? --> maybe only MST
@@ -93,14 +94,13 @@ int main(int argc, char** argv)
 
     //spit out the best method and best solution from the 0 processor and the distance
     
+    if (rankWorld == 0) {
+        t_end = MPI_Wtime();
+    }
+    cout<<"Time Spent: "<<t_end-t_begin<<endl;
     
     /* Shut down MPI */
     MPI_Finalize();
-    
-    
-    
-    
-    
     
     
     return 0;
@@ -116,7 +116,7 @@ double singleRoundImprovement(doublylinkedlist* solutionDLL,
 
     double convergence;
  	doublylinkedlist* newSolution;
- 	int NUMITERATIONS = 10; /**This number is changeable**/
+ 	int NUMITERATIONS = 100; /**This number is changeable**/
  	
 	/* switch method to run the method for only once */
     switch (methodCode) {
@@ -141,24 +141,26 @@ double singleRoundImprovement(doublylinkedlist* solutionDLL,
             newSolution  = rayOpt(solutionDLL, NUMITERATIONS);
             break;
         case 4://LK
-            
+            newSolution = TSP_LK(solutionDLL, NUMITERATIONS);
             break;
         case 5://Star Opt 
-            
+        	//here, first input is the current doubly linked list solution, 
+        	//the second input is the number of edge exchanges
+        	//the third is the number of iterations we want to do 
+            newSolution = starOpt(solutionDLL, 3 ,NUMITERATIONS);
             break;
-            
         default:
-        
+        	newSolution = solutionDLL;
             break;
     }
     
-    double convergence = solutionDLL->getDistance() - newSolution->getDistance();
-    if (convergence >= 0){ //if the appointed method produces solution that has better path
+    double convergence = (double)(solutionDLL->getDistance() - 
+    						newSolution->getDistance())/(double)(solutionDLL->getDistance());
+    if (convergence > 0){ //if the appointed method produces solution that has better path
         solutionDLL->~doublylinkedlist();
         solutionDLL = newSolution;
     }
     return convergence;
-    
 }
 
 
