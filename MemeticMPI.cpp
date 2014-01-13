@@ -24,7 +24,7 @@
 #define WORKTAG 1
 #define DIETAG 2
 #define ITERATION 100 //each round of individual island development, we have this number of iterations
-#define MEMETICFREQUENCY 2 //after every ITERATION time, the processor send out to this number of other processors
+#define MEMETICFREQUENCY  0.4 //best method propagates to these 
 
 using namespace std;
 
@@ -32,8 +32,6 @@ double singleRoundImprovement(doublylinkedlist* solutionDLL,
 			int methodCode, string filename,vector<doublylinkedlist*>* groupGA, 
 			vector<double> *edgeWeight, vector<std::pair<int,int> > *coordinates, 
 			vector<std::pair<int,int> > vertexPair);
-
-
 
 int main(int argc, char** argv)
 {
@@ -144,13 +142,15 @@ static void master() {
   	double t_begin, t_end;
    	double overallConvergence = 1;
    	HashMap *historyOfCommands;
-   	LinkedHashEntry* nextRoundMethods; //this linkedHashEntry stores the methods for next rounds
    	
    	
     t_begin = MPI_Wtime();
   	/* find out the number of processors in the common world communicator */
   	MPI_Comm_size(MPI_COMM_WORLD, &sizeWorld);
   	historyOfCommands = new HashMap(sizeWorld); //the table size in the hashmap is fixed to the size of the world
+  	LinkedHashEntry* nextRoundMethods = new LinkedHashEntry[sizeWorld] ; //this linkedHashEntry stores the methods for next rounds
+
+  	
   	/* Initialize the methods */
 	int *MethodSequence;
     int *MethodIteration;
@@ -184,36 +184,35 @@ static void master() {
 			timeTaken[source] = (*incomingMessage)[1];
 			index[source] = source;
 			historyOfCommands->put(source, incomingMessage);
+			nextRoundMethods->at(source)->setValue(extractStrategy(incomingMessage));
 			receiveCount ++;
 		}
 		
-		quickSortProperties( &convergence, &timeTaken, &index);
+		quickSortProperties( &convergence, &timeTaken, &index, 0, sizeWorld-1 );
 		cout<<"after sorting: "<<endl;
-/*for debugging */
+/*for debugging printing the sorted sequence */
 		for	(int i=0; i < sizeWorld; i++) {
 			cout<<"index: "<<(*index)[i]<<", conv: "<<(*convergence)[i]<<", time: "<<(*timeTaken)[i]<<endl;
 		}
 /*for debugging */
 		
 		/* Now process the results of this round, prepare for crossing of methods */
+		for	(int i = 0; i < (int)sizeWorld/2;  i++) {
+			//mixed strategy of the best and the worst, then goes to the center
+			mixedStrategy(nextRoundMethods->at(i), nextRoundMethods->at(sizeWorld-1-i));
+		}
 		
-		
-		/* Send a new round : (double)NumberInMethod, method array, and send the method iteration array */
-		
-		
-		
-
-
-
-    /* Send the slave a new work unit */
-    MPI_Send(&work,             /* message buffer */
-             1,                 /* one data item */
-             MPI_INT,           /* data item is an integer */
-             status.MPI_SOURCE, /* to who we just received from */
-             WORKTAG,           /* user chosen message tag */
-             MPI_COMM_WORLD);   /* default communicator */
-    /* Get the next unit of work to be done */
-  }
+		for(int sourceI = 0; sourceI < sizeWorld; sourceI++) {
+			/* Send a new round : (double)NumberInMethod, method array, and send the method iteration array */
+    		/* Send the slave a new work unit */
+    		MPI_Send(&work,             /* message buffer */
+             	1,                 /* one data item */
+             	MPI_INT,           /* data item is an integer */
+             	status.MPI_SOURCE, /* to who we just received from */
+             	WORKTAG,           /* user chosen message tag */
+             	MPI_COMM_WORLD);   /* default communicator */
+    	/* Get the next unit of work to be done */
+  		}
 
 	t_end = MPI_Wtime();
   /* 
@@ -245,7 +244,7 @@ static void master() {
 
 
 /* quickSort allows the */
-void quickSortProperties( double *convergence,  double *timeTaken,  double *index, int left, int left) {
+void quickSortProperties( double *convergence,  double *timeTaken,  double *index, int left, int right) {
   int i = left, j = right;
   double tmpConv, tmpTime,tmpInd;
   
@@ -283,6 +282,38 @@ if (i < right)
 /* helper function to define the criteria for sorting */
 double conver_time_measure (double* converg, double* time, int pivot) {
 	return ((*converg)[pivot])*((*time)[pivot]);
+}
+
+/* Extracts the strategy array and the method iteration array from the diven message */
+/* returns a pointer to a vector */
+vector<double>* extractStrategy(incomingMessage) {
+	vector<double> thisVector;
+	for (int i = 0; i < incomingMessage.size()-2; i++) {
+		thisVector.push_back(incomingMessage(i+2));	 
+		//only remains in the strategy: (double)numberOfMethods, Method Array, method frequency array
+	}
+	return &thisVector;
+}
+
+/* mixes the strategy from s1 and s2 together */
+/** preset at 1:1 mixing */
+void mixedStrategy(vector<double>* s1, vector<double>* s2) {
+	vector<double>* s11 = s1;
+	vector<double>* s22 = s2;
+	double count1, count2;
+	count1 = s1->at(0); count2 = s2-> at(0);
+
+	s1.resize(2*count1+2*count2+1);
+	s2.resize(2*count1+2*count2+1);
+	s1->at(0) = count1+count2;
+	s2->at(0) = s1->at(0);
+	
+	for(int i=1; i<= count2; i++) {
+		s1->at(count1+i) = s2->at(i);
+		methodIter2.push_back(s2->at(i+count2));
+	}
+	
+
 }
 
 
