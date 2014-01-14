@@ -15,7 +15,7 @@
 #include <vector>
 #include <iostream>
 #include <iterator>
-
+#include "MemeticMPI.hpp"
 
 using namespace std;
 
