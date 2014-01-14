@@ -16,9 +16,10 @@
 #define CROSSK 0.40  //percentage at where we cross over
 #define POPULATION 10	//the initial population generated
 //criterial for population  <= all combinations (n-1)!
-#define breedPop 8 //the size of the breeding population
-#define MUTATION 3 //how many links we mutate
+#define breedPop 6 //the size of the breeding population
+#define MUTATION 2 //how many links we mutate
 #define LISTSIZE 10 //size of the list --> will be replaced in the future by automatic size detection
+#define MAXBREEDITERATION 100
 
 
 

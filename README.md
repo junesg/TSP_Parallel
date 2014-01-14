@@ -44,3 +44,8 @@ when the np is smaller than 6, we need to find a way to loop through all methods
 
 
 MPI: to prevent usage of too much RAM we don't want to send too many messages before posting receives. we also don't want the slowest processor to get jammed. 
+
+
+ONE OF THE PROBLEM Of current:
+ you can't declare double arr[some var representing int] = {...}
+ 

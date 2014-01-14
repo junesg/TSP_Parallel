@@ -426,7 +426,7 @@ doublylinkedlist* TwoOpt(doublylinkedlist* Path, int NUMITERATIONS)
     P = copyList(Path, 0, num_nodes-1);
     
     //  cout<<" P has number of nodes = "<<num_nodes<<endl;
-   // P->displayforward(); cout<<endl;
+    //P->displayforward(); cout<<endl;
     
     int flag,m,n = 0;
     int temp[4];
@@ -503,3 +503,5 @@ doublylinkedlist* TwoOpt(doublylinkedlist* Path, int NUMITERATIONS)
 
     return P;
 }
+
+//end of file

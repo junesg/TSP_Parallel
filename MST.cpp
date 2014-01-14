@@ -88,6 +88,7 @@ void getEdgeWeight(std::vector<double> *edgeWeight, std::vector<std::pair<int,in
 		while (getline(file,line)){
 			int xPos, yPos, index;
 			sscanf(line.c_str(),"%d %d %d", &index, &xPos, &yPos);
+            //cout<<index<<","<<xPos<<","<<yPos<<endl;
 			(*coordinates).push_back(std::pair<int,int>(xPos,yPos));
 		}
 		file.close();
@@ -109,6 +110,7 @@ void getEdgeWeight(std::vector<double> *edgeWeight, std::vector<std::pair<int,in
 			(*vertexPair).push_back(pair<int,int>(row, col));
         }
     }
+    //cout<<"FINISHED !"<<endl;
 }
 
 

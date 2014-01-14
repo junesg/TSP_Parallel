@@ -5,12 +5,6 @@
 #include "TSP_LK.h"
 #include "HashTable.hpp"
 
-#define proc_root 0
-#define WORKTAG 1
-#define DIETAG 2
-#define ITERATION 100 //each round of individual island development, we have this number of iterations
-#define MEMETICFREQUENCY  0.4 //best method propagates to these 
-
 
 
 void singleRoundImprovement(doublylinkedlist* solutionDLL, 
@@ -33,7 +27,11 @@ vector<double> extractStrategy( vector<double> *incomingMessage);
 
 void mixedStrategy(vector<double>* s1, vector<double>* s2) ;
 
-static void slave(string filename);
+static void slave(string filename,
+                  vector<doublylinkedlist*>* groupGA,
+                  std::vector<double> *edgeWeight,
+                  std::vector<std::pair<int,int> > *coordinates,
+                  std::vector<std::pair<int,int> > *vertexPair);
 
 void retrieveStrategy(
 			double *incomingMessage, 

@@ -42,7 +42,7 @@ vector<doublylinkedlist*>* GA_function(vector<doublylinkedlist*>* group, int num
              //cout<<endl;
          }
          */
-        PopulationBreeding(group, fitDistance );
+        PopulationBreeding(group, fitDistance);
     }
     return group;
 /*
@@ -63,7 +63,8 @@ vector<doublylinkedlist*>* GA_function(vector<doublylinkedlist*>* group, int num
 void PopulationBreeding(std::vector<doublylinkedlist*>* group, double fitDistance ){
 	//we substitute the bottom breedPop with the new population
 	
-	for(int i = 0; i <  POPULATION-breedPop; ) {
+    int breedCount = 0;
+	for(int i = 0; i <  POPULATION-breedPop && breedCount < MAXBREEDITERATION; ) {
 		//std::srand ( time(0) );
 		//call two pairs randomly from the breeding population
 		int random1 = rand()%breedPop;
@@ -81,7 +82,7 @@ void PopulationBreeding(std::vector<doublylinkedlist*>* group, double fitDistanc
 
 		//delete newlist;
 
-		if (aList->getDistance() < fitDistance) { //IF THE OFFSPRING IS SUITED (FIT)
+		if (aList->getDistance() <= fitDistance) { //IF THE OFFSPRING IS SUITED (FIT)
 			//destroy the current worst
 			int size = group->size();
 //			delete
@@ -92,6 +93,9 @@ void PopulationBreeding(std::vector<doublylinkedlist*>* group, double fitDistanc
 			cout<<" is accepted"<<endl;
 			i++;
 		}
+        
+        
+        breedCount ++;
         delete aList;
 	}
 	

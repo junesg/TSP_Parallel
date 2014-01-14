@@ -48,7 +48,7 @@ doublylinkedlist* copyList(doublylinkedlist* P, int start, int end)
     doublylinkedlist* copied;
     copied = new doublylinkedlist();
     
-    cout<<"Start COPYLIST"<<endl;
+    //cout<<"Start COPYLIST"<<endl;
 	if (start > end) { //start has to come before end
 		return copied; //return empty list
     }
@@ -83,7 +83,7 @@ doublylinkedlist* copyList(doublylinkedlist* P, int start, int end)
 		xPos[iter] = ((int) p->x);
 		yPos[iter]=((int) p->y);
 	copied->createList(arr,xPos,yPos,count);
-    cout<<"getting out of COPYLIST"<<endl;
+   // cout<<"getting out of COPYLIST"<<endl;
 	return copied;
 }
 
@@ -124,8 +124,8 @@ void doublylinkedlist::createList(int ind[], int xPos[], int yPos[], int n)
 
 
 doublylinkedlist::~doublylinkedlist(){
-    cout<<"deleting:";
-    displayforward();
+    //cout<<"deleting:";
+    //displayforward();
     if (head!=NULL) {
         node* current = head->next;
         while( current != head ) {
@@ -135,7 +135,7 @@ doublylinkedlist::~doublylinkedlist(){
             current = next;
         }
         delete(current);
-        cout<<"delete finished"<<endl;
+        //cout<<"delete finished"<<endl;
     }
 }
 
@@ -265,7 +265,7 @@ void doublylinkedlist::displaybackward() {
 //This function takes in (pair11) and (pair21)
 //It flips (pair11,pair12) and (pair21,pair22) 
 void doublylinkedlist:: flipTwoItems(const int pair11, const int pair21){
-	cout<<"Before flipping "<<pair11<< " and "<<pair21<<endl; displayforward();
+	//cout<<"Before flipping "<<pair11<< " and "<<pair21<<endl; displayforward();
     
 	node *p11, *p12, *p21, *p22;
 	p11 = p12 = p21 = p22 = NULL;
@@ -354,7 +354,7 @@ void doublylinkedlist:: flipTwoItems(const int pair11, const int pair21){
 	}
     end = head->prev;
 
-	cout<<"After flipping"<<endl; displayforward(); cout<<"END"<<endl;
+	//cout<<"After flipping"<<endl; displayforward(); cout<<"END"<<endl;
 
 }
 
