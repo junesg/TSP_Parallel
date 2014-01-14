@@ -35,7 +35,8 @@ void mixedStrategy(vector<double>* s1, vector<double>* s2) ;
 
 static void slave(string filename);
 
-void retrieveStrategy(vector<double>* incomingMessage, 
+void retrieveStrategy(
+			double *incomingMessage, 
 			vector<double>* MethodSequence, 
 			vector<double>* MethodIteration);
 

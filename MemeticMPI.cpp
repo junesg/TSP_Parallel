@@ -125,7 +125,7 @@ static void master() {
   	/* find out the number of processors in the common world communicator */
   	MPI_Comm_size(MPI_COMM_WORLD, &sizeWorld);
   	historyOfCommands = new HashMap(sizeWorld); //the table size in the hashmap is fixed to the size of the world
-  	LinkedHashEntry* nextRoundMethods = new LinkedHashEntry*[sizeWorld] ; //this linkedHashEntry stores the methods for next rounds
+  	LinkedHashEntry* nextRoundMethods = (LinkedHashEntry*)malloc(sizeof(LinkedHashEntry)*sizeWorld); //this linkedHashEntry stores the methods for next rounds
 
   	
   	/* Initialize the methods */
@@ -243,9 +243,9 @@ void quickSortProperties( double *convergence,  double *timeTaken,  double *inde
 }
 /* recursion */
 if (left < j)
-    quickSort(convergence, timeTaken, left, j);
+    quickSort(convergence, timeTaken, index, left, j);
 if (i < right)
-        quickSort(convergence, timeTaken, i, right);
+        quickSort(convergence, timeTaken, index, i, right);
 }
 
 /* helper function to define the criteria for sorting */
@@ -379,12 +379,12 @@ static void slave(string filename) {
 	double convergence = (oldDist - newDist )/oldDist;
 	outgoingMessage.push_back(t2-t1);
 	outgoingMessage.push_back(convergence);
-	outgoingMessage.push_back(outgoingMessage->end(), MethodSequence->begin(), MethodSequence->end());
-	outgoingMessage.push_back(outgoingMessage->end(),MethodIteration->begin(), MethodIteration->end());
+	outgoingMessage.push_back(outgoingMessage.end(), MethodSequence->begin(), MethodSequence->end());
+	outgoingMessage.push_back(outgoingMessage.end(), MethodIteration->begin(), MethodIteration->end());
 	
     /* Send the result back */
     MPI_Send(&outgoingMessage, outgoingMessage.size(), MPI_DOUBLE, 0, WORKTAG, MPI_COMM_WORLD);
-    incomingMessage -> clear();
+    incomingMessage.clear();
     outgoingMessage.clear();
     oldDist = newDist;
   }
@@ -393,13 +393,13 @@ static void slave(string filename) {
 
 
 
-void retrieveStrategy(vector<double>* incomingMessage, vector<double>* MethodSequence, vector<double>* MethodIteration){
-	double count = incomingMessage -> at(0);
+void retrieveStrategy(double* incomingMessage, vector<double>* MethodSequence, vector<double>* MethodIteration){
+	double count = incomingMessage[0];
 	vector<double> method; 
 	vector<double> iter;
 	for(int i=0; i< count; i++) {
-		method.push_back(incomingMessage->at(i+1);
-		iter.push_back(incomingMessage-> at(i+count+1));
+		method.push_back(incomingMessage[i+1];
+		iter.push_back(incomingMessage[i+count+1]);
 	}
 	MethodSequence = &method;
 	MethodIteration = &iter;
