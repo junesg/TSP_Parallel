@@ -99,7 +99,7 @@ void singleRoundImprovement(doublylinkedlist* solutionDLL,
             break;
     }
     
-    double convergence = (double)(solutionDLL->getDistance() - 
+    convergence = (double)(solutionDLL->getDistance() - 
     						newSolution->getDistance())/(double)(solutionDLL->getDistance());
     if (convergence > 0){ //if the appointed method produces solution that has better path
         solutionDLL->~doublylinkedlist();

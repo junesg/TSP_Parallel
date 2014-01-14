@@ -1,3 +1,6 @@
+#ifndef HASH_TABLE_HPP
+#define HASH_TABLE_HPP
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
@@ -156,3 +159,5 @@ public:
         delete[] table;
     }
 };
+
+#endif

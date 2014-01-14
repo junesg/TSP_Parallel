@@ -3,6 +3,7 @@
 #include "MST.hpp"
 #include "GA.hpp"
 #include "TSP_LK.h"
+#include "HashTable.hpp"
 
 #define proc_root 0
 #define WORKTAG 1
