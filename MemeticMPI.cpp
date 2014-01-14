@@ -148,19 +148,24 @@ static void master() {
   		/* Loop through all results from slaves have been received */
   		while(receiveCount < sizeWorld ){
     	/* Receive results from a slave */
+    	
     		incomingMessage = (double *)malloc(sizeof(double)*messageLength);
-    		MPI_Recv(incomingMessage,           /* message buffer */
+    		MPI_Recv(&incomingMessage,           /* message buffer */
              	messageLength,                 /* one data item */
              	MPI_DOUBLE,        /* of type double real */
              	MPI_ANY_SOURCE,    /* receive from any sender */
              	MPI_ANY_TAG,       /* any type of message */
              	MPI_COMM_WORLD,    /* default communicator */
              	&status);          /* info about the received message */
-			source = status.Get_source();
-			convergence[source] = (*incomingMessage)[0];
-			timeTaken[source] = (*incomingMessage)[1];
+			source = status.MPI_SOURCE;
+			convergence[source] = incomingMessage[0];
+			timeTaken[source] = incomingMessage[1];
 			index[source] = source;
-			historyOfCommands->put(source, incomingMessage);
+			
+			vector<double> message; 
+			for(int i=0; i< messageLength; i++)
+				message.push_back ( incomingMessage[i]);
+			historyOfCommands->put(source, &message);
 			(*nextRoundMethods)[source]->setValue(&(extractStrategy(incomingMessage)));
 			receiveCount ++;
 		}
@@ -373,8 +378,8 @@ static void slave(string filename) {
 	double convergence = (oldDist- newDist )/oldDist;
 	outgoingMessage.push_back(t2-t1);
 	outgoingMessage.push_back(convergence);
-	outgoingMessage.push_back(outgoingMessage.end(), MethodSequence.begin(), MethodSequence.end());
-	outgoingMessage.push_back(outgoingMessage.end(),MethodIteration.begin(), MethodIteration.end());
+	outgoingMessage.push_back(outgoingMessage->end(), MethodSequence->begin(), MethodSequence.end());
+	outgoingMessage.push_back(outgoingMessage->end(),MethodIteration->begin(), MethodIteration.end());
 	
     /* Send the result back */
     MPI_Send(&outgoingMessage, outgoingMessage.length(), MPI_DOUBLE, 0, WORKTAG, MPI_COMM_WORLD);
@@ -421,7 +426,7 @@ doublylinkedlist* startingDLL(string filename)
     //finished initializing the element of doublylinkedlist
     doublylinkedlist* newDLL = new doublylinkedlist();
     newDLL->createList(ind, xPos, yPos, n);
-    return newDll;
+    return newDLL;
 }
 
 //end of the file
