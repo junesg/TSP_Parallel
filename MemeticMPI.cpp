@@ -35,16 +35,6 @@ int main(int argc, char** argv)
 
 	/* Initializing the solution in all of the processors*/
     string filename = "testDist.txt";
-    //first we initialize the filename and get initial doublylinkedlist
-    doublylinkedlist* solutionDLL = startingDLL(filename);
-	//initialize all the vectors for storing information of the problem.
-    vector<doublylinkedlist*>* groupGA;
-    //initialize parameters to store the problem
-    std::vector<double> *edgeWeight;
-	std::vector<std::pair<int,int> > *coordinates;
-	std::vector<std::pair<int,int> > *vertexPair;
-	//function in MST.cpp, puts value into these variables
-  	getEdgeWeight(edgeWeight, coordinates, vertexPair, filename); 
 
 	/* Separate the work division */
 	if (rankWorld == proc_root) {
@@ -53,7 +43,7 @@ int main(int argc, char** argv)
 	}
 	else {
     	//message code: double Timetaken, double convergence, double numberOfmethod , double iteration of methods
-		slave();
+		slave(filename);
 	}
 	    
     /* Shut down MPI */
@@ -68,7 +58,7 @@ int main(int argc, char** argv)
 void singleRoundImprovement(doublylinkedlist* solutionDLL, 
 			int methodCode, string filename,vector<doublylinkedlist*>* groupGA, 
 			vector<double> *edgeWeight, vector<std::pair<int,int> > *coordinates, 
-			vector<std::pair<int,int> > vertexPair) {
+			vector<std::pair<int,int> > *vertexPair) {
     double convergence;
  	doublylinkedlist* newSolution;
  	int NUMITERATIONS = 100; /**This number is changeable**/
@@ -260,7 +250,7 @@ double conver_time_measure (double* converg, double* time, int pivot) {
 
 /* Extracts the strategy array and the method iteration array from the diven message */
 /* returns a pointer to a vector */
-vector<double>* extractStrategy(incomingMessage) {
+vector<double>* extractStrategy( double *incomingMessage) {
 	vector<double> thisVector;
 	for (int i = 0; i < incomingMessage.size()-2; i++) {
 		thisVector.push_back(incomingMessage(i+2));	 
@@ -317,7 +307,7 @@ void mixedStrategy(vector<double>* s1, vector<double>* s2) {
 }
 
 
-static void slave() {
+static void slave(string filename) {
   MPI_Status status;
   vector<double> *incomingMessage;
   int messageLength;
@@ -325,6 +315,19 @@ static void slave() {
   double convergence;
   vector<double> *MethodSequence, *MethodIteration;
   vector<double> outgoingMessage;
+
+    //first we initialize the filename and get initial doublylinkedlist
+    doublylinkedlist* solutionDLL = startingDLL(filename);
+	//initialize all the vectors for storing information of the problem.
+    vector<doublylinkedlist*>* groupGA;
+    //initialize parameters to store the problem
+    std::vector<double> *edgeWeight;
+	std::vector<std::pair<int,int> > *coordinates;
+	std::vector<std::pair<int,int> > *vertexPair;
+	//function in MST.cpp, puts value into these variables
+  	getEdgeWeight(edgeWeight, coordinates, vertexPair, filename); 
+
+
 
   while (1) {
     /* Probe and Receive a message from the master */
@@ -399,7 +402,7 @@ void retrieveStrategy(vector<double>* incomingMessage, vector<double>* MethodSeq
  * Functions below are helper functions for initializing the master
  */
 //find the initial doublylinkedlist from the problem file
-doublylinkedlist* startingDll(string filename)
+doublylinkedlist* startingDLL(string filename)
 {
     vector<double> edgeWeight; //edgeWeight is coupled wth the vertexPair function
     vector<std::pair<int,int> > coordinates; //later expanded in getEdgeWeight function

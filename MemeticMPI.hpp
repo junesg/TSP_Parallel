@@ -18,10 +18,24 @@ void singleRoundImprovement(doublylinkedlist* solutionDLL,
 			vector<std::pair<int,int> > vertexPair);
 			
 static void master() ;
-void quickSortProperties( double *convergence,  double *timeTaken,  double *index, int left, int right) ;
+
+void quickSortProperties( 
+			double *convergence,  
+			double *timeTaken,  
+			double *index, 
+			int left, 
+			int right) ;
+
 double conver_time_measure (double* converg, double* time, int pivot) ;
-vector<double>* extractStrategy(incomingMessage) ;
+
+vector<double>* extractStrategy( double *incomingMessage) ;
+
 void mixedStrategy(vector<double>* s1, vector<double>* s2) ;
-static void slave();
-void retrieveStrategy(vector<double>* incomingMessage, vector<double>* MethodSequence, vector<double>* MethodIteration);
-doublylinkedlist* startingDll(string filename);
+
+static void slave(string filename);
+
+void retrieveStrategy(vector<double>* incomingMessage, 
+			vector<double>* MethodSequence, 
+			vector<double>* MethodIteration);
+
+doublylinkedlist* startingDLL(string filename);
