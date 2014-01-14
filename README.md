@@ -49,3 +49,6 @@ MPI: to prevent usage of too much RAM we don't want to send too many messages be
 ONE OF THE PROBLEM Of current:
  you can't declare double arr[some var representing int] = {...}
  
+ 
+  mpic++ MemeticMPI.cpp doublylinked.cpp MST.cpp GA.cpp graph.cpp TSP_LK.cpp DisjointSets.cpp -g
+ 

@@ -1,20 +1,16 @@
 #include "GA.hpp"
 
 
-
-vector<doublylinkedlist*>* GA_produceGroup(vector<pair<int,int> > coordinates){
-    
-    vector<doublylinkedlist*>* group;
-    
+void GA_produceGroup(vector<pair<int,int> > coordinates, vector<doublylinkedlist*>* groupGA){
+        
     int n_size = coordinates.size();
     int ind[n_size];
     for (int i=0; i<n_size; i++) {
         ind[i]=i;
     }
     
-	group =  GenerateInitPopulation(coordinates,ind);
+	GenerateInitPopulation(coordinates,ind, groupGA);
 
-    return group;
 }
 
 
@@ -29,9 +25,9 @@ vector<doublylinkedlist*>* GA_function(vector<doublylinkedlist*>* group, int num
             distances.push_back((*it)->getDistance());
         }
         
-        cout<<"Distancs has "<<distances.size()<<" elements"<<endl;
+        //cout<<"Distancs has "<<distances.size()<<" elements"<<endl;
         double fitDistance = sortPopDistance(group, &distances,0,distances.size()-1);
-        cout<<"fit Distance: "<<fitDistance<<endl;
+       // cout<<"fit Distance: "<<fitDistance<<endl;
 
 /*
         for (vector<doublylinkedlist* >::iterator it=group->begin(); it!= group->end(); it++)
@@ -74,10 +70,10 @@ void PopulationBreeding(std::vector<doublylinkedlist*>* group, double fitDistanc
 		//first the two pairs cross-over
 		doublylinkedlist* newlist = crossOver1(group->at(random1) , group->at(random2));
 
-		cout<<"##############New List############## "<<endl; newlist->displayforward(); cout<<endl;
+		//cout<<"##############New List############## "<<endl; newlist->displayforward(); cout<<endl;
 		doublylinkedlist *aList = mutate(newlist);	
-		cout<<"After new list###############"<<endl; aList->displayforward(); cout<<endl;
-		cout<<"rand1 = "<<random1<<", rand2 = "<<random2<<" and fit distance = "<< fitDistance<<" mutated distance: "<<newlist->getDistance()<<endl;
+		//cout<<"After new list###############"<<endl; aList->displayforward(); cout<<endl;
+		//cout<<"rand1 = "<<random1<<", rand2 = "<<random2<<" and fit distance = "<< fitDistance<<" mutated distance: "<<newlist->getDistance()<<endl;
         delete newlist;
 
 		//delete newlist;
@@ -90,7 +86,7 @@ void PopulationBreeding(std::vector<doublylinkedlist*>* group, double fitDistanc
 			//add new element to the list
 			group->at(breedPop + i)  = copyList(aList,0,aList->countNodes()-1);
 			//replace the lower ranked population
-			cout<<" is accepted"<<endl;
+			//cout<<" is accepted"<<endl;
 			i++;
 		}
         
@@ -131,26 +127,26 @@ doublylinkedlist* crossOver1(doublylinkedlist* p1,doublylinkedlist* p2){
     int indices[breakPt+1];
     //int content[3];
     t1->extractIndices(indices);
-	cout<<"t1 extracted is "<<endl;
-	t1->displayforward();cout<<endl;
+	//cout<<"t1 extracted is "<<endl;
+	//t1->displayforward();cout<<endl;
 
     //before dlete
-   cout<< "BEFOE DELETE t2 = ";
-   t2->displayforward();
+   //cout<< "BEFOE DELETE t2 = ";
+   //t2->displayforward();
     for (int i = 0 ; i <= breakPt; i++) {
         t2->deleteNode(indices[i]);
     }
-    cout<<"t2 is now ";
-    t2->displayforward();
-    cout<<endl;
+    //cout<<"t2 is now ";
+   // t2->displayforward();
+   // cout<<endl;
    // t2 -> ~doublylinkedlist();
     
     
-    cout<<endl;
+    //cout<<endl;
     t1->appendList(*t2);
-    cout<<"ater appending to t1 : "<<endl;
-    t1->displayforward();
-    cout<<endl;
+    //cout<<"ater appending to t1 : "<<endl;
+    //t1->displayforward();
+//    cout<<endl;
 
     
     return t1;
@@ -161,35 +157,32 @@ doublylinkedlist* crossOver1(doublylinkedlist* p1,doublylinkedlist* p2){
 
 //Generate a group of linked lists as the initial population of the system
 //This takes in the ###WHERE THE PROBLEM IS
-vector<doublylinkedlist*>* GenerateInitPopulation(std::vector< pair<int,int> > coordinates, int* ind){
-	vector<doublylinkedlist*> *population;
-    population = new vector<doublylinkedlist*>();
+void GenerateInitPopulation(std::vector< pair<int,int> > coordinates, int* ind, vector<doublylinkedlist*>* groupGA ){
     
     for (int i=0; i< POPULATION;) {
-        population->push_back(GenerateOneSpecies(coordinates,i,ind));
-        population->at(i)->displayforward();
-        cout<<" pushed back"<<endl;
+        groupGA->push_back(GenerateOneSpecies(coordinates,i,ind));
+        //population->at(i)->displayforward();
+//        cout<<" pushed back"<<endl;
         bool repeat = false;
         for (int j=0; j<i; j++) {
             //if this list already exists
-            cout<<"the "<<j<<"th item is "<<endl;
-            population->at(j)->displayforward();
+            //cout<<"the "<<j<<"th item is "<<endl;
+            //population->at(j)->displayforward();
             
-            cout<<"***** BEGIN COMPARE*******"<<endl;
-            if (population->at(j)->compareList(population->at(i))) {
-                cout<<" already exisits as the "<<j<<"th element"<<endl;
-                population->at(i)->~doublylinkedlist();
-                population->erase(population->begin()+(i-1));
+//            cout<<"***** BEGIN COMPARE*******"<<endl;
+            if (groupGA->at(j)->compareList(groupGA->at(i))) {
+//                cout<<" already exisits as the "<<j<<"th element"<<endl;
+                groupGA->at(i)->~doublylinkedlist();
+                groupGA->erase(groupGA->begin()+(i-1));
                 repeat = true;
             }
-            cout<<"***** AFTER COMPARE*******"<<endl;
+//            cout<<"***** AFTER COMPARE*******"<<endl;
         }
         if (!repeat) {
             i++;
         }
     }
 	
-	return population;
 }
 
 //function to create one species using the seed as a random generator seed
@@ -197,7 +190,7 @@ doublylinkedlist* GenerateOneSpecies(std::vector< pair<int,int> > coordinates,in
 	//std::srand ( unsigned ( seed ) );
 
 	int n = coordinates.size(); //number of items
-	cout<<" In one speces, the coordinate size = "<<n<<endl;
+//	cout<<" In one speces, the coordinate size = "<<n<<endl;
 	vector<int> xPos;
 	vector<int> yPos;
 	//create the array of indexs
@@ -220,7 +213,7 @@ doublylinkedlist* GenerateOneSpecies(std::vector< pair<int,int> > coordinates,in
 	doublylinkedlist* species;
 	species = new doublylinkedlist();
 	species->createList( index , xArr , yArr, n); 
-	species->displayforward(); cout<< "  created"<<endl;
+//	species->displayforward(); cout<< "  created"<<endl;
 	return species;
 }
 

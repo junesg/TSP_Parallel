@@ -23,7 +23,7 @@ void quickSortProperties(
 
 double conver_time_measure (double* converg, double* time, int pivot) ;
 
-vector<double> extractStrategy( vector<double> *incomingMessage);
+void extractStrategy( vector<double> *incomingMessage,vector<double> *output) ;
 
 void mixedStrategy(vector<double>* s1, vector<double>* s2) ;
 

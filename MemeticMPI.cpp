@@ -51,14 +51,18 @@ int main(int argc, char** argv)
 #endif
     
     //initialize all the vectors for storing information of the problem.
-    vector<doublylinkedlist*>* groupGA;
+    vector<doublylinkedlist*> groupGA;
+    
+#ifdef DEBUG
+    cout<<"in "<<rankWorld<<" groupGA is empty: "<< groupGA.empty()<<endl;
+#endif
+    
     //initialize parameters to store the problem
     std::vector<double> edgeWeight;
 	std::vector<std::pair<int,int> > coordinates;
 	std::vector<std::pair<int,int> > vertexPair;
 	//function in MST.cpp, puts value into these variables
     
-    MPI_Barrier(MPI_COMM_WORLD);
     
     for(int i=0; i<sizeWorld; i++) {
         if(rankWorld == i) {
@@ -85,8 +89,8 @@ int main(int argc, char** argv)
 #ifdef DEBUG
         printf("Right before entering slave %d\n",rankWorld);
 #endif
-        groupGA = GA_produceGroup(coordinates);
-		slave(filename, groupGA, &edgeWeight, &coordinates, &vertexPair);
+        //groupGA = GA_produceGroup(coordinates);
+		slave(filename, &groupGA, &edgeWeight, &coordinates, &vertexPair);
 	}
 	    
     /* Shut down MPI */
@@ -99,9 +103,12 @@ int main(int argc, char** argv)
 //for each round, we use the method as presented in the method Sequence vector
 //Each method loops through method iterations
 void singleRoundImprovement(doublylinkedlist* solutionDLL, 
-			int methodCode, string filename,vector<doublylinkedlist*>* groupGA, 
-			vector<double> *edgeWeight, vector<std::pair<int,int> > *coordinates, 
+			int methodCode, string filename,
+            vector<doublylinkedlist*>* groupGA,
+			vector<double> *edgeWeight,
+            vector<std::pair<int,int> > *coordinates,
 			vector<std::pair<int,int> > *vertexPair) {
+    
     double convergence;
  	doublylinkedlist* newSolution;
  	int NUMITERATIONS = 10; /**This number is changeable**/
@@ -115,12 +122,12 @@ void singleRoundImprovement(doublylinkedlist* solutionDLL,
         
         case 1: //the GA method
 #ifdef DEBUG
-            cout<<"Defined method: GA, with prob "<<endl;
+            cout<<"Defined method: GA, with prob"<<endl;
             solutionDLL->displayforward();
             cout<<"Number of iterations: "<<NUMITERATIONS<<endl;
 #endif
-            if(groupGA->at(0)->countNodes() ==0) { //if the group is empty
-         		groupGA = GA_produceGroup(*coordinates); //initial population is created
+            if(groupGA->empty()) { //if the group is empty
+         		GA_produceGroup(*coordinates, groupGA); //initial population is created
                 cout<<"groupGA created"<<endl;
             }
             
@@ -130,9 +137,14 @@ void singleRoundImprovement(doublylinkedlist* solutionDLL,
 #endif
             
             groupGA =  GA_function(groupGA, NUMITERATIONS);//one iterations of breeding only
-            newSolution = groupGA->at(0);
+            newSolution =copyList( groupGA->at(0), 0 , groupGA->at(0)->countNodes()-1) ;
 
-            
+#ifdef DEBUG
+            cout<<"Finished breeding groupGA:"<<endl;
+            groupGA->at(0)->displayforward();
+            cout<<"and"<<endl;
+            newSolution -> displayforward();
+#endif
             break;
             
         case 2://the 2opt method
@@ -223,20 +235,23 @@ static void master() {
     
   /* Loop over getting new work requests until there is no more work
      to be done */
-  while (overallConvergence == 1) {
+  while (overallConvergence > 1/10000) {
 		
-  		int receiveCount = 0;
+  		//int receiveCount = 0;
   		double convergenceAR[(int)sizeWorld-1];
   		double timeTaken[(int)sizeWorld-1];
   		double index[(int)sizeWorld-1];
   		
   		/* Loop through all results from slaves have been received */
-  		while(receiveCount < sizeWorld-1 ){
+      for(int receiveCount =0; receiveCount < sizeWorld-1 ; receiveCount ++){
+#ifdef DEBUG
+            printf("Enter master receiving while loop \n");
+#endif
     	/* Receive results from a slave */
             MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
             MPI_Get_count(&status, MPI_DOUBLE, &messageLength);
     		incomingMessage = (double *)malloc(sizeof(double)*messageLength);
-    		MPI_Recv(&incomingMessage,           /* message buffer */
+    		MPI_Recv(incomingMessage,           /* message buffer */
              	messageLength,                 /* one data item */
              	MPI_DOUBLE,        /* of type double real */
              	MPI_ANY_SOURCE,    /* receive from any sender */
@@ -247,26 +262,56 @@ static void master() {
 			source = (int)status.MPI_SOURCE;
 #ifdef DEBUG
             printf("Message received from source %d \n", source);
+            printf("message read as: ");
+            for (int i = 0 ; i<messageLength; i++) {
+                printf("%f, ", incomingMessage[i]);
+            }
+            printf("\n");
 #endif
             //MEssage: time, convergence, series
 			convergenceAR[(int)source-1] = (double)incomingMessage[1];
 			timeTaken[(int)source-1] = (double)incomingMessage[0];
 			index[(int)source-1] = source;
 			
-			vector<double> message; 
+			vector<double>* message = new vector<double>((int)messageLength);
 			for(int i=0; i< messageLength; i++)
-				message.push_back (incomingMessage[i]);
-			historyOfCommands->put(source, &message);
-			vector<double> strategyContent = extractStrategy(&message);
-			nextRoundMethods[((int)source-1)].setValue(&strategyContent);
-			receiveCount ++;
+				message->at(i)= incomingMessage[i];
+			historyOfCommands->put(source, message);
+            vector<double>* strategyContent = new vector<double>((int)messageLength-2);
+            extractStrategy(message, strategyContent);
+
+          
+            nextRoundMethods[((int)source-1)].setValue(strategyContent);
+#ifdef DEBUG
+          printf("strategy content as: ");
+          for (int i = 0 ; i<messageLength-2; i++) {
+              printf("%f, ", nextRoundMethods[((int)source-1)].getValue()->at(i));
+          }
+          printf("\n");
+#endif
+          
+          
 		}
-		//free(incomingMessage);
-		/*sort the converge and timing performance */
-		quickSortProperties(convergenceAR, timeTaken, index, 0, (int)sizeWorld-1 );
       
 #ifdef DEBUG
-      printf("smallest convergence %f",convergenceAR[0]);
+      cout<<"%%%%%%%%%%%%OUT OF LOOP!%%%%%%%%%%%%%%%%"<<endl;
+#endif
+      
+#ifdef DEBUG
+      /*for debugging printing the sorted sequence */
+      printf("BEFORE SORTING THE INDEX.... ARRAY\n");
+      for	(int i=0; i < sizeWorld-1; i++) {
+          cout<<"index: "<< index[i]<<", conv: "<< convergenceAR[i]<<", time: "<< timeTaken[i]<<endl;
+      }
+      /*for debugging */
+#endif
+
+		//free(incomingMessage);
+		/*sort the converge and timing performance */
+		quickSortProperties(convergenceAR, timeTaken, index, 0, (int)sizeWorld-2 );
+      
+#ifdef DEBUG
+      printf("smallest convergence %f\n",convergenceAR[0]);
       cout<<"after sorting: "<<endl;
       
       /*for debugging printing the sorted sequence */
@@ -277,26 +322,60 @@ static void master() {
 #endif
       
       
+      
+#ifdef DEBUG
+      /*for debugging printing the sorted sequence */
+      printf("SHOW nextRound MEthods: \n");
+      for	(int i=1; i < sizeWorld; i++) {
+          vector<double> *aVect =nextRoundMethods[(i-1)].getValue();
+          printf("the %d_th processor has input :\n", i);
+          for (int j= 0; j<aVect->size(); j++) {
+              printf("%f,", aVect->at(j));
+          }
+          printf("\n");
+      }
+      /*for debugging */
+#endif
+      
+      
 		/*store the smallest convergence value == fastest rate of convergence */
 		overallConvergence = convergenceAR[0];
-		if (overallConvergence < 1/20) break; //exit while loop if convergence has reached the standard.
+		if (overallConvergence < 1/10000) break; //exit while loop if convergence has reached the standard.
 
 		
 		/* Now process the results of this round, prepare for crossing of methods */
-		for	(int i = 0; i < (int)sizeWorld/2;  i++) {
+		for	(int i = 0; i < (int)(sizeWorld -1)/2 ;  i++) {
 			//mixed strategy of the best and the worst, then goes to the center
-			mixedStrategy(nextRoundMethods[i].getValue(), nextRoundMethods[sizeWorld-1-i].getValue());
+			mixedStrategy(nextRoundMethods[i].getValue(), nextRoundMethods[sizeWorld-2-i].getValue());
 		}
+      
+#ifdef DEBUG
+      /*for debugging printing the sorted sequence */
+      printf("SHOW nextRound MEthods AFTER MIXTuEre: \n");
+      for	(int i=1; i < sizeWorld; i++) {
+          vector<double> *aVect =nextRoundMethods[(i-1)].getValue();
+          printf("the %dth processor will received :\n",i);
+          for (int j= 0; j<aVect->size(); j++) {
+              printf("%f,", aVect->at(j));
+          }
+          printf("\n");
+      }
+      /*for debugging */
+#endif
 		
 		for(int sourceI = 1; sourceI < sizeWorld; sourceI++) {
 			/* Send a new round : (double)NumberInMethod, method array, and send the method iteration array */
     		/* Send the slave a new work unit */
-    		MPI_Send(nextRoundMethods[sourceI].getValue(),             /* message buffer */
-             		nextRoundMethods[sourceI].getValue()->at(0),                 /* one data item */
+    		MPI_Send(nextRoundMethods[sourceI-1].getValue(),             /* message buffer */
+             		nextRoundMethods[sourceI-1].getValue()->at(0),                 /* one data item */
              		MPI_DOUBLE,           /* data item is an integer */
              		sourceI, /* to who we just received from */
              		WORKTAG,           /* user chosen message tag */
              		MPI_COMM_WORLD);   /* default communicator */
+            
+            //clean up
+            delete nextRoundMethods[sourceI-1].getValue();
+            
   		}
 }
 
@@ -360,13 +439,11 @@ double conver_time_measure (double* converg, double* time, int pivot) {
 
 /* Extracts the strategy array and the method iteration array from the diven message */
 /* returns a pointer to a vector */
-vector<double> extractStrategy( vector<double> *incomingMessage) {
-	vector<double> thisVector;
+void extractStrategy( vector<double> *incomingMessage,vector<double> *output) {
 	for (int i = 2; i < incomingMessage->size(); i++) {
-		thisVector.push_back(incomingMessage->at(i));
+		output->at(i-2) = (incomingMessage->at(i));
 		//only remains in the strategy: (double)numberOfMethods, Method Array, method frequency array
 	}
-	return thisVector;
 }
 
 
@@ -423,6 +500,11 @@ static void slave(string filename,
                   std::vector<std::pair<int,int> > *vertexPair)
 {
   	MPI_Status status;
+    int rankWorld;
+    
+    MPI_Comm_rank(MPI_COMM_WORLD, &rankWorld);
+
+    
   	double *incomingMessage;
   	int messageLength;
   	double t1, t2;
@@ -436,10 +518,6 @@ static void slave(string filename,
 #ifdef DEBUG
     printf("Starting Solution \n");
     solutionDLL -> displayforward();
-#endif
-
-
-#ifdef DEBUG
     printf("right before the loop\n");
 #endif
 
@@ -496,18 +574,27 @@ static void slave(string filename,
 	for(int method=0; method < MethodSequence.size(); method++){
         for (int iter = 0; iter < MethodIteration.at(method); iter++) {
             //do the work
-            
             int methodCode = MethodSequence.at(method);
             singleRoundImprovement(solutionDLL,
             					methodCode, 
             					filename,
             					groupGA,
             					edgeWeight, 
-            					coordinates, vertexPair);    
-    	}		
+            					coordinates, vertexPair);
+//#ifdef DEBUG
+//            cout<<"Check GROUPGA in slave!"<<endl;
+//            cout<<"size of groupGA is "<< groupGA->size()<<endl;
+//            cout<<"########"<<endl;
+//            groupGA -> at(1)->displayforward();
+//            groupGA -> at(2)->displayforward();
+//            groupGA -> at(0)->displayforward();
+//            cout<<"########"<<endl;
+//#endif
+    	}
+
 	}
       
-      newDist = solutionDLL-> getDistance();
+    newDist = solutionDLL-> getDistance();
 
 	t2 = MPI_Wtime();
 	double convergence = (oldDist - newDist )/oldDist;
@@ -523,13 +610,13 @@ static void slave(string filename,
 	outgoingMessage.insert(outgoingMessage.end(), MethodSequence.begin(), MethodSequence.end());
 	outgoingMessage.insert(outgoingMessage.end(), MethodIteration.begin(), MethodIteration.end());
 	
-#ifdef DEBUG
-      cout<<"NOW OUTGOING MESSAGE: "<<endl;
-      for (int i = 0 ; i<outgoingMessage.size(); i++) {
-          cout<<outgoingMessage.at(i)<<",";
-      }
-      cout<<endl;
-#endif
+//#ifdef DEBUG
+//      cout<<"NOW OUTGOING MESSAGE from "<<rankWorld<<" : "<<endl;
+//      for (int i = 0 ; i<outgoingMessage.size(); i++) {
+//          cout<<outgoingMessage.at(i)<<",";
+//      }
+//      cout<<endl;
+//#endif
       
       
    

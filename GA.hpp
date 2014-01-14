@@ -24,12 +24,17 @@
 
 
 using namespace std;
-vector<doublylinkedlist*>* GA_produceGroup(vector<pair<int,int> > coordinates);
+
+void GA_produceGroup(vector<pair<int,int> > coordinates, vector<doublylinkedlist*>* groupGA);
+
 vector<doublylinkedlist*>* GA_function(vector<doublylinkedlist*>* group, int numberOfIteration);
 
 doublylinkedlist* crossOver1(doublylinkedlist *p1,doublylinkedlist* p2);
 doublylinkedlist* GenerateOneSpecies(std::vector<pair<int,int> > coordinates,int seed, int* ind);
-vector<doublylinkedlist*>* GenerateInitPopulation(std::vector <pair<int,int> > coordinates, int* ind);
+
+void GenerateInitPopulation(std::vector< pair<int,int> > coordinates, int* ind,vector<doublylinkedlist*>* groupGA );
+
+
 double sortPopDistance(vector< doublylinkedlist* >  *list, vector<float> *distances, int left, int right);
 int myrandom (int i);
 void PopulationBreeding(std::vector<doublylinkedlist*>* group, double fitDistance );

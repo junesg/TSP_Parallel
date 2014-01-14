@@ -513,7 +513,7 @@ bool doublylinkedlist::compareList(doublylinkedlist* aList){
     node* thatp = aList->head;
     
 	if(thisp->data != thatp->data){
-        cout<<"returning false"<<endl;
+        //cout<<"returning false"<<endl;
         return false;
     }
 	thisp = thisp->next;
@@ -521,11 +521,14 @@ bool doublylinkedlist::compareList(doublylinkedlist* aList){
 	while(thisp != head && thatp != aList->head) {
 		//cout<<" "<<thisp->data<<" compared to "<<thatp->data<<endl;
 		if(thisp->data != thatp->data) {
-            cout<<"returning false"<<endl;
+            //cout<<"returning false"<<endl;
 			return false;
         }
 		thisp = thisp -> next; thatp = thatp -> next;
     }
-    cout<<"returning true"<<endl;
+    //cout<<"returning true"<<endl;
     return true;
 }
+
+
+//end of file
