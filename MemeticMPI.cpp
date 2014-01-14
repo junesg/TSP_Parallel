@@ -166,13 +166,13 @@ static void master() {
 			for(int i=0; i< messageLength; i++)
 				message.push_back ( incomingMessage[i]);
 			historyOfCommands->put(source, &message);
-			nextRoundMethods[source].setValue(&(extractStrategy(&message)));
+			vector<double> strategyContent = extractStrategy(&message);
+			nextRoundMethods[source].setValue(&strategyContent);
 			receiveCount ++;
 		}
 		free(incomingMessage);
-		
 		/*sort the converge and timing performance */
-		quickSortProperties( &convergence, &timeTaken, &index, 0, sizeWorld-1 );
+		quickSortProperties( &convergence, &timeTaken, &index, 0, (int)sizeWorld-1 );
 		/*store the smallest convergence value == fastest rate of convergence */
 		overallConvergence = convergence[0];
 		if (overallConvergence < 1/20) break; //exit while loop if convergence has reached the standard.
@@ -192,7 +192,7 @@ static void master() {
 		for(int sourceI = 0; sourceI < sizeWorld; sourceI++) {
 			/* Send a new round : (double)NumberInMethod, method array, and send the method iteration array */
     		/* Send the slave a new work unit */
-    		MPI_Send(nextRoundMethods[sourceI],             /* message buffer */
+    		MPI_Send(nextRoundMethods[sourceI].getValue(),             /* message buffer */
              		nextRoundMethods[sourceI].getValue()->at(0),                 /* one data item */
              		MPI_DOUBLE,           /* data item is an integer */
              		sourceI, /* to who we just received from */
@@ -379,13 +379,13 @@ static void slave(string filename) {
 	double convergence = (oldDist - newDist )/oldDist;
 	outgoingMessage.push_back(t2-t1);
 	outgoingMessage.push_back(convergence);
-	outgoingMessage.push_back(outgoingMessage.end(), MethodSequence->begin(), MethodSequence->end());
-	outgoingMessage.push_back(outgoingMessage.end(), MethodIteration->begin(), MethodIteration->end());
+	outgoingMessage.insert(outgoingMessage.end(), MethodSequence->begin(), MethodSequence->end());
+	outgoingMessage.insert(outgoingMessage.end(), MethodIteration->begin(), MethodIteration->end());
 	
     /* Send the result back */
     MPI_Send(&outgoingMessage, outgoingMessage.size(), MPI_DOUBLE, 0, WORKTAG, MPI_COMM_WORLD);
     free(incomingMessage);
-    outgoingMessage -> clear();
+    outgoingMessage.clear();
     oldDist = newDist;
   }
   
