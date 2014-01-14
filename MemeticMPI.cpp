@@ -166,7 +166,7 @@ static void master() {
 			for(int i=0; i< messageLength; i++)
 				message.push_back ( incomingMessage[i]);
 			historyOfCommands->put(source, &message);
-			nextRoundMethods[source]->setValue(&(extractStrategy(&message)));
+			nextRoundMethods[source].setValue(&(extractStrategy(&message)));
 			receiveCount ++;
 		}
 		free(incomingMessage);
@@ -186,14 +186,14 @@ static void master() {
 		/* Now process the results of this round, prepare for crossing of methods */
 		for	(int i = 0; i < (int)sizeWorld/2;  i++) {
 			//mixed strategy of the best and the worst, then goes to the center
-			mixedStrategy(nextRoundMethods[i], nextRoundMethods[sizeWorld-1-i]);
+			mixedStrategy(nextRoundMethods[i].getValue(), nextRoundMethods[sizeWorld-1-i].getValue());
 		}
 		
 		for(int sourceI = 0; sourceI < sizeWorld; sourceI++) {
 			/* Send a new round : (double)NumberInMethod, method array, and send the method iteration array */
     		/* Send the slave a new work unit */
     		MPI_Send(nextRoundMethods[sourceI],             /* message buffer */
-             		nextRoundMethods[sourceI]->at(0),                 /* one data item */
+             		nextRoundMethods[sourceI].getValue()->at(0),                 /* one data item */
              		MPI_DOUBLE,           /* data item is an integer */
              		sourceI, /* to who we just received from */
              		WORKTAG,           /* user chosen message tag */
@@ -243,9 +243,9 @@ void quickSortProperties( double *convergence,  double *timeTaken,  double *inde
 }
 /* recursion */
 if (left < j)
-    quickSort(convergence, timeTaken, index, left, j);
+    quickSortProperties(convergence, timeTaken, index, left, j);
 if (i < right)
-        quickSort(convergence, timeTaken, index, i, right);
+        quickSortProperties(convergence, timeTaken, index, i, right);
 }
 
 /* helper function to define the criteria for sorting */
@@ -384,8 +384,8 @@ static void slave(string filename) {
 	
     /* Send the result back */
     MPI_Send(&outgoingMessage, outgoingMessage.size(), MPI_DOUBLE, 0, WORKTAG, MPI_COMM_WORLD);
-    incomingMessage.clear();
-    outgoingMessage.clear();
+    free(incomingMessage);
+    outgoingMessage -> clear();
     oldDist = newDist;
   }
   
@@ -394,11 +394,11 @@ static void slave(string filename) {
 
 
 void retrieveStrategy(double* incomingMessage, vector<double>* MethodSequence, vector<double>* MethodIteration){
-	double count = incomingMessage[0];
+	int count = (int) incomingMessage[0];
 	vector<double> method; 
 	vector<double> iter;
 	for(int i=0; i< count; i++) {
-		method.push_back(incomingMessage[i+1];
+		method.push_back(incomingMessage[i+1]);
 		iter.push_back(incomingMessage[i+count+1]);
 	}
 	MethodSequence = &method;
