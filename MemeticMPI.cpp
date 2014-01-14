@@ -158,13 +158,13 @@ static void master() {
              	MPI_COMM_WORLD,    /* default communicator */
              	&status);          /* info about the received message */
 			source = status.MPI_SOURCE;
-			convergence[source] = incomingMessage[0];
-			timeTaken[source] = incomingMessage[1];
-			index[source] = source;
+			convergence[source] = (double)incomingMessage[1];
+			timeTaken[source] = (double)incomingMessage[0];
+			index[source] = (double)source;
 			
 			vector<double> message; 
 			for(int i=0; i< messageLength; i++)
-				message.push_back ( incomingMessage[i]);
+				message.push_back (incomingMessage[i]);
 			historyOfCommands->put(source, &message);
 			vector<double> strategyContent = extractStrategy(&message);
 			nextRoundMethods[source].setValue(&strategyContent);
