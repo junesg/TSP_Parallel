@@ -71,7 +71,7 @@ void singleRoundImprovement(doublylinkedlist* solutionDLL,
             break;
         
         case 1: //the GA method
-            if(groupGA->isEmpty()) { //if the group is empty 
+            if(groupGA->size() ==0) { //if the group is empty 
          		groupGA = GA_produceGroup(coordinates); //initial population is created
             } 
             groupGA =  GA_function(groupGA, 1);//one iterations of breeding only
@@ -166,7 +166,7 @@ static void master() {
 			for(int i=0; i< messageLength; i++)
 				message.push_back ( incomingMessage[i]);
 			historyOfCommands->put(source, &message);
-			(*nextRoundMethods)[source]->setValue(&(extractStrategy(incomingMessage)));
+			nextRoundMethods[source]->setValue(&(extractStrategy(&message)));
 			receiveCount ++;
 		}
 		incomingMessage->clear();
@@ -186,14 +186,14 @@ static void master() {
 		/* Now process the results of this round, prepare for crossing of methods */
 		for	(int i = 0; i < (int)sizeWorld/2;  i++) {
 			//mixed strategy of the best and the worst, then goes to the center
-			mixedStrategy((*nextRoundMethods)[i], (*nextRoundMethods)[sizeWorld-1-i]);
+			mixedStrategy(nextRoundMethods[i], nextRoundMethods[sizeWorld-1-i]);
 		}
 		
 		for(int sourceI = 0; sourceI < sizeWorld; sourceI++) {
 			/* Send a new round : (double)NumberInMethod, method array, and send the method iteration array */
     		/* Send the slave a new work unit */
-    		MPI_Send((*nextRoundMethods)[sourceI],             /* message buffer */
-             		(*nextRoundMethods)[sourceI]->at(0),                 /* one data item */
+    		MPI_Send(nextRoundMethods[sourceI],             /* message buffer */
+             		nextRoundMethods[sourceI]->at(0),                 /* one data item */
              		MPI_DOUBLE,           /* data item is an integer */
              		sourceI, /* to who we just received from */
              		WORKTAG,           /* user chosen message tag */
@@ -204,7 +204,7 @@ static void master() {
   t_end = MPI_Wtime();
   
   	/* Tell all the slaves to exit by sending an empty message with the DIETAG. */
-  	for (rank = 1; rank < ntasks; ++rank) {
+  	for (int rank = 1; rank < sizeWorld; ++rank) {
     	MPI_Send(0, 0, MPI_INT, rank, DIETAG, MPI_COMM_WORLD);
   	}
   
@@ -217,7 +217,7 @@ void quickSortProperties( double *convergence,  double *timeTaken,  double *inde
   int i = left, j = right;
   double tmpConv, tmpTime,tmpInd;
   
-  int pivot = arr[(left + right) / 2];
+  int pivot = index[(left + right) / 2];
 
   /* partition */
   while (i <= j) {
@@ -255,10 +255,10 @@ double conver_time_measure (double* converg, double* time, int pivot) {
 
 /* Extracts the strategy array and the method iteration array from the diven message */
 /* returns a pointer to a vector */
-vector<double> extractStrategy( double *incomingMessage) {
+vector<double> extractStrategy( vector<double> *incomingMessage) {
 	vector<double> thisVector;
-	for (int i = 0; i < incomingMessage.size()-2; i++) {
-		thisVector.push_back(incomingMessage(i+2));	 
+	for (int i = 0; i < incomingMessage->size()-2; i++) {
+		thisVector.push_back(incomingMessage->at(i+2));	 
 		//only remains in the strategy: (double)numberOfMethods, Method Array, method frequency array
 	}
 	return thisVector;
@@ -313,14 +313,14 @@ void mixedStrategy(vector<double>* s1, vector<double>* s2) {
 
 
 static void slave(string filename) {
-  MPI_Status status;
-  vector<double> *incomingMessage;
-  int messageLength;
-  double t1, t2;
-  double convergence;
-  vector<double> *MethodSequence, *MethodIteration;
-  vector<double> outgoingMessage;
-
+  	MPI_Status status;
+  	double *incomingMessage;
+  	int messageLength;
+  	double t1, t2;
+  	double convergence;
+  	vector<double> *MethodSequence, *MethodIteration;
+  	vector<double> outgoingMessage;
+	double oldDist, newDist;
     //first we initialize the filename and get initial doublylinkedlist
     doublylinkedlist* solutionDLL = startingDLL(filename);
 	//initialize all the vectors for storing information of the problem.
@@ -331,8 +331,9 @@ static void slave(string filename) {
 	std::vector<std::pair<int,int> > *vertexPair;
 	//function in MST.cpp, puts value into these variables
   	getEdgeWeight(edgeWeight, coordinates, vertexPair, filename); 
-
-
+	
+	oldDist = solutionDLL->getDistance();
+	
 
   while (1) {
     /* Probe and Receive a message from the master */
@@ -365,7 +366,7 @@ static void slave(string filename) {
             //do the work
             double oldDist = solutionDLL-> getDistance();
             int methodCode = MethodSequence->at(method);
-            singleRoundImrovement(solutionDLL, 
+            singleRoundImprovement(solutionDLL, 
             					methodCode, 
             					filename,
             					groupGA,
@@ -374,17 +375,18 @@ static void slave(string filename) {
     	}		
 	}
 	t2 = MPI_Wtime();
-	double newDist = solutionDLL-> getDistance();
-	double convergence = (oldDist- newDist )/oldDist;
+	newDist = solutionDLL-> getDistance();
+	double convergence = (oldDist - newDist )/oldDist;
 	outgoingMessage.push_back(t2-t1);
 	outgoingMessage.push_back(convergence);
-	outgoingMessage.push_back(outgoingMessage->end(), MethodSequence->begin(), MethodSequence.end());
-	outgoingMessage.push_back(outgoingMessage->end(),MethodIteration->begin(), MethodIteration.end());
+	outgoingMessage.push_back(outgoingMessage->end(), MethodSequence->begin(), MethodSequence->end());
+	outgoingMessage.push_back(outgoingMessage->end(),MethodIteration->begin(), MethodIteration->end());
 	
     /* Send the result back */
-    MPI_Send(&outgoingMessage, outgoingMessage.length(), MPI_DOUBLE, 0, WORKTAG, MPI_COMM_WORLD);
+    MPI_Send(&outgoingMessage, outgoingMessage.size(), MPI_DOUBLE, 0, WORKTAG, MPI_COMM_WORLD);
     incomingMessage -> clear();
-    outgoingMessage -> clear();
+    outgoingMessage.clear();
+    oldDist = newDist;
   }
   
 }
@@ -397,7 +399,7 @@ void retrieveStrategy(vector<double>* incomingMessage, vector<double>* MethodSeq
 	vector<double> iter;
 	for(int i=0; i< count; i++) {
 		method.push_back(incomingMessage->at(i+1);
-		iter.push_back(incomingMessage-> at(i+count+1);
+		iter.push_back(incomingMessage-> at(i+count+1));
 	}
 	MethodSequence = &method;
 	MethodIteration = &iter;

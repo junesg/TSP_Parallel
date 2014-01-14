@@ -74,7 +74,7 @@ public:
     
     vector<double>* get(int key) { //key starts from zero to tablesize-1
     	//first create a null pointer to be returned
-    	vector<int>* nullVect;
+    	vector<double>* nullVect;
         //int hash = (key % TABLE_SIZE);
         if (table[key] == NULL) {
             return nullVect;
