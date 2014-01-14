@@ -72,7 +72,7 @@ public:
             table[i] = NULL;
     }
     
-    vector<int>* get(int key) { //key starts from zero to tablesize-1
+    vector<double>* get(int key) { //key starts from zero to tablesize-1
     	//first create a null pointer to be returned
     	vector<int>* nullVect;
         //int hash = (key % TABLE_SIZE);
@@ -91,7 +91,7 @@ public:
     }
     
     int getNumberOfRound(int key) {
-        vector<int>* nullVect;
+        vector<double>* nullVect;
         int rounds = 0;
 	    if (table[key] == NULL) {
             return rounds;
