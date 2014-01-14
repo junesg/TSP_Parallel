@@ -114,12 +114,12 @@ void singleRoundImprovement(doublylinkedlist* solutionDLL,
  * It then receives the resulting convergence rate from the slaves. 
  */
 static void master() {
-  	int sizeWorld, messageLength, source;
+  	int sizeWorld, messageLength;
+  	int source;
   	MPI_Status status;
   	double t_begin, t_end;
    	double overallConvergence = 1;
    	HashMap *historyOfCommands;
-   	
    	
     t_begin = MPI_Wtime();
   	/* find out the number of processors in the common world communicator */
@@ -141,9 +141,9 @@ static void master() {
 		MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
         MPI_Get_count(&status, MPI_DOUBLE, &messageLength);
   		int receiveCount = 0;
-  		double convergence[sizeWorld];
-  		double timeTaken[sizeWorld];
-  		double index[sizeWorld];
+  		double convergence[sizeWorld-1];
+  		double timeTaken[sizeWorld-1];
+  		double index[sizeWorld-1];
   		
   		/* Loop through all results from slaves have been received */
   		while(receiveCount < sizeWorld ){
@@ -157,10 +157,10 @@ static void master() {
              	MPI_ANY_TAG,       /* any type of message */
              	MPI_COMM_WORLD,    /* default communicator */
              	&status);          /* info about the received message */
-			source = status.MPI_SOURCE;
-			convergence[source] = (double)incomingMessage[1];
-			timeTaken[source] = (double)incomingMessage[0];
-			index[source] = (double)source;
+			(int)source = (int)status.MPI_SOURCE;
+			convergence[source-1] = (double)incomingMessage[1];
+			timeTaken[source-1] = (double)incomingMessage[0];
+			index[source-1] = source;
 			
 			vector<double> message; 
 			for(int i=0; i< messageLength; i++)
