@@ -66,13 +66,13 @@ void singleRoundImprovement(doublylinkedlist* solutionDLL,
 	/* switch method to run the method for only once */
     switch (methodCode) {
         case 0: //the MST method
-            newSolution= DLLFromMST(edgeWeight, coordinates, vertexPair );
+            newSolution= DLLFromMST(*edgeWeight, *coordinates, *vertexPair);
             //MST solution is unique, so we will preserve the new solution if it is better
             break;
         
         case 1: //the GA method
             if(groupGA->size() ==0) { //if the group is empty 
-         		groupGA = GA_produceGroup(coordinates); //initial population is created
+         		groupGA = GA_produceGroup(*coordinates); //initial population is created
             } 
             groupGA =  GA_function(groupGA, 1);//one iterations of breeding only
             newSolution = groupGA->at(0);
@@ -125,7 +125,7 @@ static void master() {
   	/* find out the number of processors in the common world communicator */
   	MPI_Comm_size(MPI_COMM_WORLD, &sizeWorld);
   	historyOfCommands = new HashMap(sizeWorld); //the table size in the hashmap is fixed to the size of the world
-  	LinkedHashEntry* nextRoundMethods = new LinkedHashEntry[sizeWorld] ; //this linkedHashEntry stores the methods for next rounds
+  	LinkedHashEntry* nextRoundMethods = new LinkedHashEntry*[sizeWorld] ; //this linkedHashEntry stores the methods for next rounds
 
   	
   	/* Initialize the methods */
@@ -169,7 +169,7 @@ static void master() {
 			nextRoundMethods[source]->setValue(&(extractStrategy(&message)));
 			receiveCount ++;
 		}
-		incomingMessage->clear();
+		free(incomingMessage);
 		
 		/*sort the converge and timing performance */
 		quickSortProperties( &convergence, &timeTaken, &index, 0, sizeWorld-1 );
