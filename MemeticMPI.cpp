@@ -157,7 +157,7 @@ static void master() {
              	MPI_ANY_TAG,       /* any type of message */
              	MPI_COMM_WORLD,    /* default communicator */
              	&status);          /* info about the received message */
-			(int)source = (int)status.MPI_SOURCE;
+			source = (int)status.MPI_SOURCE;
 			convergence[source-1] = (double)incomingMessage[1];
 			timeTaken[source-1] = (double)incomingMessage[0];
 			index[source-1] = source;
