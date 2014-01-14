@@ -128,31 +128,7 @@ slave(void)
 
 
 
-/*
- * Functions below are helper functions for initializing the master
- */
-//find the initial doublylinkedlist from the problem file
-doublylinkedlist* startingDll(string filename)
-{
-    vector<double> edgeWeight; //edgeWeight is coupled wth the vertexPair function
-    vector<std::pair<int,int> > coordinates; //later expanded in getEdgeWeight function
-    vector<std::pair<int,int> > vertexPair; //later expanded in getEdgeWeight function
-    getEdgeWeight(&edgeWeight, &coordinates, &vertexPair, filename);
-    
-    int n = coordinates.size();
-    int xPos[n], yPos[n],ind[n];
-    int count = 0;
-    for (vector<std::pair<int,int> >::iterator it = coordinates.begin(); it != coordinates.end(); it++) {
-        ind[count] = count;
-        xPos[count] = (*it).first;
-        yPos[count] = (*it).second;
-        count ++;
-    }
-    //finished initializing the element of doublylinkedlist
-    doublylinkedlist* newDLL = new doublylinkedlist();
-    newDLL->createList(ind, xPos, yPos, n);
-    return newDll;
-}
+
 
 
 // A utility function to print an array
