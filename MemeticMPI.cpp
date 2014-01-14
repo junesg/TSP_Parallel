@@ -6,6 +6,7 @@
  *  University of Michigan Ann Arbor. All rights reserved.
  *  method: 0: MST, 1:GA, 2:TwoOpt, 3:RayOpt, 4:KL, 5:StarOpt 
  *	message coding: (double)convergence, (double)time, (double)lengthOfMethod, method array, method iteration array
+ *  although works with less than 5 processors, recommend working with more than 6 processors to reap the benefits of all functionalities of this library
  *
  */
 
@@ -23,12 +24,11 @@ using namespace std;
 #define proc_root 0
 #define WORKTAG 1
 #define DIETAG 2
-#define ITERATION 10 //each round of individual island development, we have this number of iterations
-#define MEMETICFREQUENCY  0.4 //best method propagates to these
+#define ITERATION 128 //each round of individual island development, we have this number of iterations
+#define MEMETICFREQUENCY  0.3 //These proportion of communication has been going on
 
 
-
-#define DEBUG
+//#define DEBUG
 
 
 int main(int argc, char** argv)
@@ -292,10 +292,7 @@ static void master() {
           
           
 		}
-      
-#ifdef DEBUG
-      cout<<"%%%%%%%%%%%%OUT OF LOOP!%%%%%%%%%%%%%%%%"<<endl;
-#endif
+
       
 #ifdef DEBUG
       /*for debugging printing the sorted sequence */
@@ -344,9 +341,21 @@ static void master() {
 
 		
 		/* Now process the results of this round, prepare for crossing of methods */
-		for	(int i = 0; i < (int)(sizeWorld -1)/2 ;  i++) {
+    
+      
+		for	(int i = 0; i < (int)(sizeWorld * MEMETICFREQUENCY) ;  i++) {
 			//mixed strategy of the best and the worst, then goes to the center
-			mixedStrategy(nextRoundMethods[i].getValue(), nextRoundMethods[sizeWorld-2-i].getValue());
+            //randomly select a strategy from the faster half
+            int index1 = rand()%((sizeWorld-2)/2);
+            
+            //randomly select a strategy from the slower half
+            int index2 = sizeWorld-2 - rand()%((sizeWorld-2)/2);
+            
+#ifdef DEBUG
+            printf(" ^^^^^^^^^^^These are the idnexes genearted: %d, %d\n", index1, index2);
+#endif
+            
+			mixedStrategy(nextRoundMethods[index1].getValue(), nextRoundMethods[index2].getValue());
 		}
       
 #ifdef DEBUG
@@ -362,12 +371,28 @@ static void master() {
       }
       /*for debugging */
 #endif
+      
+      
 		
 		for(int sourceI = 1; sourceI < sizeWorld; sourceI++) {
 			/* Send a new round : (double)NumberInMethod, method array, and send the method iteration array */
     		/* Send the slave a new work unit */
-    		MPI_Send(nextRoundMethods[sourceI-1].getValue(),             /* message buffer */
-             		nextRoundMethods[sourceI-1].getValue()->at(0),                 /* one data item */
+            
+            int messageSize = nextRoundMethods[sourceI-1].getValue()->size();
+            vector<double>* sendMessage = nextRoundMethods[sourceI-1].getValue();
+            double outMessage[(messageSize+1)];
+            
+//            printf("&&&&&&&&&&&&before sending out: ");
+            outMessage[0] = (double)messageSize/2;
+//            printf("%f, ", outMessage[0]);
+            for (int j= 0; j<messageSize; j++) {
+                outMessage[j+1] = sendMessage->at(j);
+//                printf("%f,",outMessage[j+1]);
+            }
+//            printf("\n");
+            
+    		MPI_Send(&outMessage,             /* message buffer */
+             		messageSize+1,                 /* one data item */
              		MPI_DOUBLE,           /* data item is an integer */
              		sourceI, /* to who we just received from */
              		WORKTAG,           /* user chosen message tag */
@@ -428,13 +453,10 @@ void quickSortProperties( double *convergence,  double *timeTaken,  double *inde
 }
 
 
-
-
 /* helper function to define the criteria for sorting */
 double conver_time_measure (double* converg, double* time, int pivot) {
 	return (converg[pivot])*(time[pivot]);
 }
-
 
 
 /* Extracts the strategy array and the method iteration array from the diven message */
@@ -452,14 +474,15 @@ void extractStrategy( vector<double> *incomingMessage,vector<double> *output) {
 void mixedStrategy(vector<double>* s1, vector<double>* s2) {
     
 	double count1, count2;
-	count1 = (double)s1->size()/2; count2 = (double)s2-> size()/2;
+	count1 = (double)s1->size()/2;
+    count2 = (double)s2-> size()/2;
     
 	/* First check that if s1 and s2 are no longer divisible*/
-	for(int i=count1-1; i < s1->size(); i++) {
+	for(int i=count1; i < s1->size(); i++) {
 		if (s1->at(i) <= 1)
 			return;
 	}
-	for(int i=count2-1; i < s2->size(); i++) {
+	for(int i=count2; i < s2->size(); i++) {
 		if (s2->at(i) <= 1)
 			return;
 	}
@@ -489,6 +512,7 @@ void mixedStrategy(vector<double>* s1, vector<double>* s2) {
 	s2-> insert( s2->end(), method1.begin(), method1.end());
 	s2-> insert( s2->end(), iter2.begin(), iter2.end());
 	s2-> insert( s2->end(), iter1.begin(), iter1.end());
+    
 }
 
 
