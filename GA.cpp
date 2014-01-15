@@ -14,7 +14,7 @@ void GA_produceGroup(vector<pair<int,int> > coordinates, vector<doublylinkedlist
 }
 
 
-vector<doublylinkedlist*>* GA_function(vector<doublylinkedlist*>* group, int numberOfIteration){
+void GA_function(vector<doublylinkedlist*>* group, int numberOfIteration){
 		
     //DEFINE CONVERGENCE
     while (numberOfIteration > 0) {
@@ -25,9 +25,7 @@ vector<doublylinkedlist*>* GA_function(vector<doublylinkedlist*>* group, int num
             distances.push_back((*it)->getDistance());
         }
         
-        //cout<<"Distancs has "<<distances.size()<<" elements"<<endl;
         double fitDistance = sortPopDistance(group, &distances,0,distances.size()-1);
-       // cout<<"fit Distance: "<<fitDistance<<endl;
 
 /*
         for (vector<doublylinkedlist* >::iterator it=group->begin(); it!= group->end(); it++)
@@ -40,8 +38,15 @@ vector<doublylinkedlist*>* GA_function(vector<doublylinkedlist*>* group, int num
          */
         PopulationBreeding(group, fitDistance);
     }
-    return group;
-/*
+    vector<float> distances;
+    for (vector<doublylinkedlist* >::iterator it=group->begin(); it!= group->end(); it++) {
+        distances.push_back((*it)->getDistance());
+    }
+    
+    sortPopDistance(group, &distances,0,distances.size()-1);
+    
+    
+    /*/
 //	//cout<<endl<<" ****** After one round of breeding"<<endl;
 //	  for (vector<doublylinkedlist *>::iterator it=group->begin(); it!= group->end(); it++) {
 //			(*it)->rearrangeList(0);	       		       	
@@ -58,7 +63,12 @@ vector<doublylinkedlist*>* GA_function(vector<doublylinkedlist*>* group, int num
 
 void PopulationBreeding(std::vector<doublylinkedlist*>* group, double fitDistance ){
 	//we substitute the bottom breedPop with the new population
-	
+	if (group->empty()) {
+        printf("Error: population not initiated!\n");
+        return;
+    }
+    
+    
     int breedCount = 0;
 	for(int i = 0; i <  POPULATION-breedPop && breedCount < MAXBREEDITERATION; ) {
 		//std::srand ( time(0) );

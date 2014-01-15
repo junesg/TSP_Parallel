@@ -23,6 +23,12 @@ public:
         this->value = value;
         this->next = NULL;
     }
+    
+    LinkedHashEntry(int key) {
+        this->key = key;
+        this->value = NULL;
+        this->next = NULL;
+    }
     //function to delete this entry
     ~LinkedHashEntry() {
     	delete value;   
@@ -145,6 +151,29 @@ public:
         }
     }
     
+    void printMap() {
+        printf("Printing HashMap hsitory:\n");
+        for (int key=0; key< TABLE_SIZE; key++) {
+
+            if (table[key] != NULL) {
+                printf("\nTable Entry %d\n",key);
+                printf("==========================\n",key);
+                LinkedHashEntry *entry = table[key];
+                while (entry!= NULL) {
+                    vector<double>* values = entry->getValue();
+                    if (!values->empty()) {
+                        for (int i = 0; i < values->size(); i++) {
+                            printf("%f, ", values->at(i));
+                        }
+                        printf("\n ----------------\n");
+                    }
+                    entry = entry->getNext();
+                }
+            }
+            printf("=====================\n");
+        }
+    }
+    
     ~HashMap() {
         for (int i = 0; i < TABLE_SIZE; i++)
             if (table[i] != NULL) {
@@ -161,3 +190,5 @@ public:
 };
 
 #endif
+
+//end of file
