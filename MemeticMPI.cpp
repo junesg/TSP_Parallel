@@ -40,6 +40,7 @@ int main(int argc, char** argv)
     int rankWorld;
     int sizeWorld;
 	MPI_Init(&argc, &argv);
+    double convergence;
     
     //get the rank of this processor
     MPI_Comm_rank(MPI_COMM_WORLD, &rankWorld);
@@ -57,6 +58,8 @@ int main(int argc, char** argv)
 	std::vector<std::pair<int,int> > vertexPair;
     doublylinkedlist* solutionDLL;
     
+    
+
     for(int i=0; i<sizeWorld; i++) {
         if(rankWorld == i) { //to do this is to prevent multiple processors accessing the same file
             getEdgeWeight(&edgeWeight, &coordinates, &vertexPair, filename);
@@ -68,13 +71,36 @@ int main(int argc, char** argv)
 	/* Separate the work division */
 	if (rankWorld == proc_root) {
 		//receive messages from various processors
-		master();
+		convergence = master();
 	}
 	else {
     	//message code: double Timetaken, double convergence, double numberOfmethod , double iteration of methods
-		slave(filename, &groupGA, &edgeWeight, &coordinates, &vertexPair);
+		solutionDLL = slave(filename, &groupGA, &edgeWeight, &coordinates, &vertexPair);
 	}
-	    
+	   
+    
+    for(int i = 0; i <= sizeWorld; i++ ){
+        if (rankWorld == i && i != 0) {
+            printf("\n########################\n");
+            printf("solution from processor %d is ", rankWorld);
+            solutionDLL->displayforward();
+            printf("########################\n");
+        }
+        MPI_Barrier(MPI_COMM_WORLD);
+    }
+    
+    for(int i = 0; i <= sizeWorld; i++ ){
+        if (rankWorld == i && i != 0) {
+            printf("\ndistance from processor %d is ", rankWorld);
+            printf("distance = %f\n", solutionDLL->getDistance());
+        }
+        MPI_Barrier(MPI_COMM_WORLD);
+        
+    }
+    
+    printf("Convergence is %f\n",convergence);
+    
+    
     /* Shut down MPI */
     MPI_Finalize();
     
@@ -149,7 +175,7 @@ void singleRoundImprovement(doublylinkedlist* solutionDLL,
  * The Master program is in charge of allocating the methods to each slave, 
  * It then receives the resulting convergence rate from the slaves. 
  */
-static void master() {
+static double master() {
   	int sizeWorld, messageLength;
   	int source;
   	MPI_Status status;
@@ -217,25 +243,25 @@ static void master() {
 			
 			vector<double>* message = new vector<double>((int)messageLength);
             
-            /*
-            printf("incoming message from %d\n",source);
-			for(int i=0; i< messageLength; i++) {
-				message->at(i)= incomingMessage[i];
-                printf("%f,", message->at(i));
-            }
-             */
+            
+//            printf("incoming message from %d\n",source);
+//			for(int i=0; i< messageLength; i++) {
+//				message->at(i)= incomingMessage[i];
+//                printf("%f,", message->at(i));
+//            }
+//            printf("\n");
             
 			historyOfCommands->put(source-1, message);
             vector<double>* strategyContent = new vector<double>((int)messageLength-2);
             extractStrategy(message, strategyContent);
             nextRoundMethods[((int)source-1)]->setValue(strategyContent);
-//#ifdef DEBUG
+/*#ifdef DEBUG
 //            printf("strategy content for %d processor: ", source);
 //            for (int i = 0 ; i<messageLength-2; i++) {
 //                printf("%f, ", nextRoundMethods[((int)source-1)]->getValue()->at(i));
 //            }
 //            printf("\n");
-//#endif
+//#endif */
 		}
       
       
@@ -255,6 +281,7 @@ static void master() {
 		for	(int i = 0; i < (int)(sizeWorld * MEMETICFREQUENCY) ;  i++) {
 			//mixed strategy of the better strategies and the less effective strategies
             //randomly select a strategy from the faster half
+            srand(time(NULL));
             int index1 = rand()%((int)(sizeWorld-1)/2);
             //randomly select a strategy from the slower half
             int index2 = sizeWorld-2 - rand()%((sizeWorld-1)/2);
@@ -289,6 +316,7 @@ static void master() {
             delete nextRoundMethods[sourceI-1]->getValue();
   		}
       
+      
 }
 
   t_end = MPI_Wtime();
@@ -298,8 +326,9 @@ static void master() {
     	MPI_Send(0, 0, MPI_INT, rank, DIETAG, MPI_COMM_WORLD);
   	}
     //%%%%%%%%%%%%%%%%%%%%%%print out the history of methods that have been used
-    historyOfCommands->printMap();
+  //  historyOfCommands->printMap();
 	cout<<"Time Spent: "<<t_end-t_begin<<endl;
+    return overallConvergence;
    
 }
 
@@ -404,7 +433,8 @@ void mixedStrategy(vector<double>* s1, vector<double>* s2) {
 
 
 //Slave works to iteration and send the info back to the master
-static void slave(string filename,
+static doublylinkedlist* slave(
+                  string filename,
                   vector<doublylinkedlist*>* groupGA,
                   std::vector<double> *edgeWeight,
                   std::vector<std::pair<int,int> > *coordinates,
@@ -414,7 +444,6 @@ static void slave(string filename,
     int rankWorld;
     
     MPI_Comm_rank(MPI_COMM_WORLD, &rankWorld);
-
     
   	double *incomingMessage;
   	int messageLength;
@@ -433,15 +462,8 @@ static void slave(string filename,
 	
 	/* Check the tag of the received message. */
     if (status.MPI_TAG == DIETAG) {
-        //%%%%%%%%%%%%%%%%%%%%%%print out the solution and its distance in this slave
-        printf("\n########################\n");
-        printf("solution from %d is ", rankWorld);
-        solutionDLL->displayforward();
-        printf("\n");
-        printf("distance = %f\n", solutionDLL->getDistance());
-        printf("########################\n");
-
-        return;
+       
+        return solutionDLL;
     }
 
     MPI_Get_count(&status, MPI_DOUBLE, &messageLength);

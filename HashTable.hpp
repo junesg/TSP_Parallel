@@ -150,29 +150,27 @@ public:
             }
         }
     }
-    
-    void printMap() {
-        printf("Printing HashMap hsitory:\n");
-        for (int key=0; key< TABLE_SIZE; key++) {
-
-            if (table[key] != NULL) {
-                printf("\nTable Entry %d\n",key);
-                printf("==========================\n",key);
-                LinkedHashEntry *entry = table[key];
-                while (entry!= NULL) {
-                    vector<double>* values = entry->getValue();
-                    if (!values->empty()) {
-                        for (int i = 0; i < values->size(); i++) {
-                            printf("%f, ", values->at(i));
-                        }
-                        printf("\n ----------------\n");
-                    }
-                    entry = entry->getNext();
-                }
-            }
-            printf("=====================\n");
-        }
-    }
+//    
+//    void printMap() {
+//        printf("Printing HashMap hsitory:\n");
+//        for (int key=0; key< TABLE_SIZE; key++) {
+//
+//            if (table[key] != NULL) {
+//                printf("\nTable Entry %d\n",key);
+//                printf("==========================\n",key);
+//                vector<double>* values = this->get(key);
+//                while (!values->empty() && values != NULL) {
+//                        for (int i = 0; i < values->size(); i++) {
+//                            printf("%f, ", values->at(i));
+//                        }
+//                        printf("\n ----------------\n");
+//                    this->remove(key);
+//                    values = this->get(key);
+//                }
+//            }
+//            printf("=====================\n");
+//        }
+//    }
     
     ~HashMap() {
         for (int i = 0; i < TABLE_SIZE; i++)
