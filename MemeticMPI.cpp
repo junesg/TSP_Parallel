@@ -25,10 +25,10 @@ using namespace std;
 #define WORKTAG 1
 #define DIETAG 2
 #define EXITTAG 3
-#define ITERATION 4096 //each round of individual island development, we have this number of iterations
+#define ITERATION 2048 //each round of individual island development, we have this number of iterations
 #define STRATEGYMUTATE 0.10 //rate of mutation of the strategy
 #define MAX_ZERO_CONVERGE 10 //how many zero convergence overall across ALL methods can we have before master quits
-#define DEBUG
+//#define DEBUG
 
 
 //#define DEBUG
