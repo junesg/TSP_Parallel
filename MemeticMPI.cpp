@@ -25,9 +25,10 @@ using namespace std;
 #define WORKTAG 1
 #define DIETAG 2
 #define EXITTAG 3
-#define ITERATION 2048 //each round of individual island development, we have this number of iterations
+#define ITERATION 4096 //each round of individual island development, we have this number of iterations
 #define STRATEGYMUTATE 0.10 //rate of mutation of the strategy
-//#define DEBUG
+#define MAX_ZERO_CONVERGE 10 //how many zero convergence overall across ALL methods can we have before master quits
+#define DEBUG
 
 
 //#define DEBUG
@@ -191,6 +192,7 @@ static double master() {
    	double overallConvergence = 1;
    	HashMap *historyOfCommands;
     double *incomingMessage;
+    int zeroConvergenceCount = 0;
     
     
   	/* find out the number of processors in the common world communicator */
@@ -221,7 +223,7 @@ static double master() {
     t_begin = MPI_Wtime();
   /* Loop over getting new work requests until there is no more work
      to be done */
-  while (overallConvergence > 1/10000) {
+  while (overallConvergence > 1/10000 || zeroConvergenceCount < MAX_ZERO_CONVERGE) {
 		//printf("DEBG1!\n");
   		//int receiveCount = 0;
 
@@ -250,26 +252,25 @@ static double master() {
 			
 			vector<double>* message = new vector<double>((int)messageLength);
             
-            
-//            printf("incoming message from %d\n",source);
-//			for(int i=0; i< messageLength; i++) {
-//				message->at(i)= incomingMessage[i];
-//                printf("%f,", message->at(i));
-//            }
-//            printf("\n");
+            printf("incoming message from %d\n",source);
+			for(int i=0; i< messageLength; i++) {
+				message->at(i)= incomingMessage[i];
+                printf("%f,", message->at(i));
+            }
+            printf("\n");
             
 			historyOfCommands->put(source-1, message);
             vector<double>* strategyContent = new vector<double>((int)messageLength-2);
             extractStrategy(message, strategyContent);
             nextRoundMethods[((int)source-1)]->setValue(strategyContent);
 //
-//#ifdef DEBUG
-//            printf("strategy content for %d processor: ", source);
-//            for (int i = 0 ; i<messageLength-2; i++) {
-//                printf("%f, ", nextRoundMethods[((int)source-1)]->getValue()->at(i));
-//            }
-//            printf("\n");
-//#endif
+#ifdef DEBUG
+            printf("strategy content for %d processor: ", source);
+            for (int i = 0 ; i<messageLength-2; i++) {
+                printf("%f, ", nextRoundMethods[((int)source-1)]->getValue()->at(i));
+            }
+            printf("\n");
+#endif
 		}
       
       		//free(incomingMessage);
@@ -279,15 +280,19 @@ static double master() {
 
 		/*store the biggest convergence value == fastest rate of convergence */
 		overallConvergence = convergenceAR[sizeWorld-2];
-
-		if (overallConvergence < 1/10000) break; //exit while loop if convergence has reached the standard.
-		
-#ifdef DEBUG
-      printf("DEBUG!!!\n");
+#ifdef DEBUG 
+      printf("Overall Converge Rate: %f\n", overallConvergence);
 #endif
+
+      if (overallConvergence == 0) {
+          zeroConvergenceCount ++;
+      }
+      else {
+          zeroConvergenceCount = 0;
+      }//exit while loop if convergence has reached the standard.
+
 		/* Now process the results of the effectiveness of methods in this round, prepare for crossing of methods */
         BreedingMethod (sizeWorld,nextRoundMethods, index);
-     
 
 		for(int sourceI = 1; sourceI < sizeWorld; sourceI++) {
 			/* Send a new round : (double)NumberInMethod, method array, and send the method iteration array */
@@ -445,28 +450,12 @@ void BreedingMethod (const int sizeWorld, LinkedHashEntry** nextRoundMethods, co
  */
 void mutateStrategy(vector<double>* strategy) {
     //first calculate how many strategies there are
-    
-#ifdef DEBUG
-    printf("original strategy before mutation: ");
-    for (int x = 0; x<strategy->size(); x++) {
-        printf("%f,",strategy->at(x));
-    }
-    printf("\n");
-#endif
-    
     int count = strategy->size()/2;
     //then mutate with rate STRATEGYMUTATE
     for (int i = 0; i < STRATEGYMUTATE*count; i++) {
         strategy->at(rand()%count) = rand()%6; //randomly select the method to mutate to
     }
-    
-#ifdef DEBUG
-    printf("original strategy after mutation: ");
-    for (int x = 0; x<strategy->size(); x++) {
-        printf("%f,",strategy->at(x));
-    }
-    printf("\n");
-#endif
+
 }
 
 
@@ -649,7 +638,7 @@ void retrieveStrategy(double* incomingMessage, vector<double> *MethodSequence, v
 //find the initial doublylinkedlist from the problem file
 doublylinkedlist* startingDLL(string filename)
 {
-    vector<double> edgeWeight; //edgeWeight is coupled wth the vertexPair function
+    vector<double> edgeWeight; //edgeWeight is coupled wth thse vertexPair function
     vector<std::pair<int,int> > coordinates; //later expanded in getEdgeWeight function
     vector<std::pair<int,int> > vertexPair; //later expanded in getEdgeWeight function
     getEdgeWeight(&edgeWeight, &coordinates, &vertexPair, filename);
