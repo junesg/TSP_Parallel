@@ -83,14 +83,14 @@ public:
     	vector<double>* nullVect1;
         //int hash = (key % TABLE_SIZE);
         if (table[key] == NULL) {
-            return nullVect1;
+            return NULL;
         }
         else {
             LinkedHashEntry *entry = table[key];
             while (entry != NULL && entry->getKey() != key)
                 entry = entry->getNext();
             if (entry == NULL)
-                return nullVect1;
+                return NULL;
             else
                 return entry->getValue();
         }
