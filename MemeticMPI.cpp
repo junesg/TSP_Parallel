@@ -28,7 +28,7 @@ using namespace std;
 #define ITERATION 2048 //each round of individual island development, we have this number of iterations
 #define STRATEGYMUTATE 0.10 //rate of mutation of the strategy
 #define MAX_ZERO_CONVERGE 10 //how many zero convergence overall across ALL methods can we have before master quits
-//#define DEBUG
+#define DEBUG2
 
 
 //#define DEBUG
@@ -252,18 +252,15 @@ static double master() {
 			
 			vector<double>* message = new vector<double>((int)messageLength);
             
-            printf("incoming message from %d\n",source);
-			for(int i=0; i< messageLength; i++) {
+            for(int i=0; i< messageLength; i++) {
 				message->at(i)= incomingMessage[i];
-                printf("%f,", message->at(i));
             }
-            printf("\n");
             
 			historyOfCommands->put(source-1, message);
             vector<double>* strategyContent = new vector<double>((int)messageLength-2);
             extractStrategy(message, strategyContent);
             nextRoundMethods[((int)source-1)]->setValue(strategyContent);
-//
+
 #ifdef DEBUG
             printf("strategy content for %d processor: ", source);
             for (int i = 0 ; i<messageLength-2; i++) {

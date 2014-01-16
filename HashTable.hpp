@@ -80,17 +80,17 @@ public:
     
     vector<double>* get(int key) { //key starts from zero to tablesize-1
     	//first create a null pointer to be returned
-    	vector<double>* nullVect;
+    	vector<double>* nullVect1;
         //int hash = (key % TABLE_SIZE);
         if (table[key] == NULL) {
-            return nullVect;
+            return nullVect1;
         }
         else {
             LinkedHashEntry *entry = table[key];
             while (entry != NULL && entry->getKey() != key)
                 entry = entry->getNext();
             if (entry == NULL)
-                return nullVect;
+                return nullVect1;
             else
                 return entry->getValue();
         }
