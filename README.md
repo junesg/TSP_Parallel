@@ -52,3 +52,6 @@ ONE OF THE PROBLEM Of current:
  
   mpic++ MemeticMPI.cpp doublylinked.cpp MST.cpp GA.cpp graph.cpp TSP_LK.cpp DisjointSets.cpp -g
  
+
+mpic++ MemeticMPI.cpp doublylinked.cpp MST.cpp GA.cpp graph.cpp TSP_LK.cpp DisjointSets.cpp -g
+mpirun -np 6 ./a.out

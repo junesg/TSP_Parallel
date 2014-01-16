@@ -5,7 +5,6 @@
 
 using namespace std;
 #define LISTSIZE 6
-#define NUMITERATIONS 20
 
 
 //void rayOpt(doublylinkedlist P);
@@ -243,7 +242,7 @@ void doublylinkedlist::displayforward() {
         return;
     }
 	while(1) {
-        printf("%d ",p->data);
+        printf("%d ",p->data+1);
         //printf("%d (%d,%d), ",p->data,p->x,p->y);
         p=p->next;
         if (p==NULL || p==head) break;

@@ -5,8 +5,7 @@
 #include "doublylinked.h"
 
 
-#define MAXDEPTH 2
-//#define LISTSIZE 10
+#define MAXDEPTH 30
 
 using namespace std;
 

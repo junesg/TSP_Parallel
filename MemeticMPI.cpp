@@ -25,15 +25,13 @@ using namespace std;
 #define WORKTAG 1
 #define DIETAG 2
 #define EXITTAG 3
-#define ITERATION 32 //each round of individual island development, we have this number of iterations
-#define MEMETICFREQUENCY  0.3 //These proportion of communication has been going on
+#define ITERATION 2048 //each round of individual island development, we have this number of iterations
+#define MEMETICFREQUENCY  0.8 //These proportion of communication has been going on
 #define DEBUG
-//GA population is defined in GA.hpp as 10
-//GA breedPop is defined in GA.hpp as 6
+
 
 
 //#define DEBUG
-
 int main(int argc, char** argv)
 {
 	/* Initialize MPI environment */
@@ -47,8 +45,9 @@ int main(int argc, char** argv)
     //get the size of the world, find out how many processors are executing at the same time
     MPI_Comm_size(MPI_COMM_WORLD, &sizeWorld);
 
+   // chdir("/TSPLIB");
 	/* Initializing the solution in all of the processors*/
-    string filename = "testDist.txt";
+    string filename = "kroC100.tsp";
     
     //initialize parameters to store the problem
     //initialize all the vectors for storing information of the problem.
@@ -83,6 +82,7 @@ int main(int argc, char** argv)
         if (rankWorld == i && i != 0) {
             printf("\n########################\n");
             printf("solution from processor %d is ", rankWorld);
+            solutionDLL->rearrangeList(0);
             solutionDLL->displayforward();
             printf("########################\n");
         }
@@ -95,11 +95,10 @@ int main(int argc, char** argv)
             printf("distance = %f\n", solutionDLL->getDistance());
         }
         MPI_Barrier(MPI_COMM_WORLD);
-        
     }
     
-    printf("Convergence is %f\n",convergence);
-    
+    printf("Final Convergence is %f\n",convergence);
+    if(rankWorld == 0) printf(" filename is "); cout<<filename<<endl;
     
     /* Shut down MPI */
     MPI_Finalize();
@@ -115,16 +114,22 @@ void singleRoundImprovement(doublylinkedlist* solutionDLL,
             vector<doublylinkedlist*>* groupGA,
 			vector<double> *edgeWeight,
             vector<std::pair<int,int> > *coordinates,
-			vector<std::pair<int,int> > *vertexPair) {
+			vector<std::pair<int,int> > *vertexPair,
+            int NUMITERATIONS) {
     
     double convergence;
  	doublylinkedlist* newSolution;
- 	int NUMITERATIONS = 10; /**This number is changeable**/
+ 	
 
 	/* switch method to run the method for only once */
     switch (methodCode) {
         case 0: //the MST method
             newSolution= DLLFromMST(*edgeWeight, *coordinates, *vertexPair);
+            if (!solutionDLL) {
+                if (newSolution->getDistance() > solutionDLL->getDistance()) {
+                    newSolution = solutionDLL;
+                }
+            }
             //MST solution is unique, so we will preserve the new solution if it is better
             break;
         
@@ -244,30 +249,28 @@ static double master() {
 			vector<double>* message = new vector<double>((int)messageLength);
             
             
-//            printf("incoming message from %d\n",source);
-//			for(int i=0; i< messageLength; i++) {
-//				message->at(i)= incomingMessage[i];
-//                printf("%f,", message->at(i));
-//            }
-//            printf("\n");
+            printf("incoming message from %d\n",source);
+			for(int i=0; i< messageLength; i++) {
+				message->at(i)= incomingMessage[i];
+                printf("%f,", message->at(i));
+            }
+            printf("\n");
             
 			historyOfCommands->put(source-1, message);
             vector<double>* strategyContent = new vector<double>((int)messageLength-2);
             extractStrategy(message, strategyContent);
             nextRoundMethods[((int)source-1)]->setValue(strategyContent);
-/*#ifdef DEBUG
-//            printf("strategy content for %d processor: ", source);
-//            for (int i = 0 ; i<messageLength-2; i++) {
-//                printf("%f, ", nextRoundMethods[((int)source-1)]->getValue()->at(i));
-//            }
-//            printf("\n");
-//#endif */
+
+#ifdef DEBUG
+            printf("strategy content for %d processor: ", source);
+            for (int i = 0 ; i<messageLength-2; i++) {
+                printf("%f, ", nextRoundMethods[((int)source-1)]->getValue()->at(i));
+            }
+            printf("\n");
+#endif
 		}
       
-      
-       // printf("DEBG3!\n");
-
-		//free(incomingMessage);
+      		//free(incomingMessage);
 		/*sort the converge and timing performance */
 		quickSortProperties(convergenceAR, timeTaken, index, 0, (int)sizeWorld-2 );
 
@@ -281,10 +284,12 @@ static double master() {
 		for	(int i = 0; i < (int)(sizeWorld * MEMETICFREQUENCY) ;  i++) {
 			//mixed strategy of the better strategies and the less effective strategies
             //randomly select a strategy from the faster half
-            srand(time(NULL));
-            int index1 = rand()%((int)(sizeWorld-1)/2);
+            srand(time(NULL)+i);
+            //int index1 = rand()%((int)(sizeWorld-1)/2);
+            int index1 = rand()%((int)(sizeWorld-1));
             //randomly select a strategy from the slower half
-            int index2 = sizeWorld-2 - rand()%((sizeWorld-1)/2);
+            //int index2 = sizeWorld-2 - rand()%((sizeWorld-1)/2);
+            int index2 = rand()%((int)(sizeWorld-1));
 			mixedStrategy(nextRoundMethods[index1]->getValue(), nextRoundMethods[index2]->getValue());
 		}
       
@@ -485,29 +490,29 @@ static doublylinkedlist* slave(
     retrieveStrategy(incomingMessage, &MethodSequence, &MethodIteration);
 
       
-      double oldDist = solutionDLL-> getDistance();
+    double oldDist = solutionDLL-> getDistance();
       
     /* start the loop of work */
 	for(int method=0; method < MethodSequence.size(); method++){
-        for (int iter = 0; iter < MethodIteration.at(method); iter++) {
             //do the work
-            int methodCode = MethodSequence.at(method);
+        int methodCode = MethodSequence.at(method);
+        int methodIter =(int)MethodIteration.at(method);
             singleRoundImprovement(solutionDLL,
             					methodCode, 
             					filename,
             					groupGA,
             					edgeWeight, 
-            					coordinates, vertexPair);
-
-    	}
-
+            					coordinates,
+                                vertexPair,
+                                methodIter );
 	}
       
     newDist = solutionDLL-> getDistance();
 
 	t2 = MPI_Wtime();
 	double convergence = (oldDist - newDist )/oldDist;
-
+    
+    outgoingMessage.clear();
 	outgoingMessage.push_back(t2-t1);
 	outgoingMessage.push_back(convergence);
 	outgoingMessage.insert(outgoingMessage.end(), MethodSequence.begin(), MethodSequence.end());

@@ -10,7 +10,8 @@
 void singleRoundImprovement(doublylinkedlist* solutionDLL, 
 			int methodCode, string filename,vector<doublylinkedlist*>* groupGA, 
 			vector<double> *edgeWeight, vector<std::pair<int,int> > *coordinates, 
-			vector<std::pair<int,int> > vertexPair);
+			vector<std::pair<int,int> > vertexPair,
+            int numberofIterations);
 			
 static double master() ;
 
