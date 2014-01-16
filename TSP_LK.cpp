@@ -190,7 +190,6 @@ doublylinkedlist* rayOpt(doublylinkedlist* Path,int NUMITERATIONS) //number of i
     int temp[4];
     float current_distance = 0;
     float best_distance = P->getDistance();
-    vector<vector<int> > pairs;
     doublylinkedlist* tempList;
     
     while (n < NUMITERATIONS && n < num_nodes*(num_nodes-3)/2) {
@@ -207,26 +206,12 @@ doublylinkedlist* rayOpt(doublylinkedlist* Path,int NUMITERATIONS) //number of i
         
         //check if the pair are adjacent or if the nodes are the same
         if (temp[0]==temp[2] || temp[0]==temp[3] || temp[1]==temp[2]) flag = 1;
-        //check if this pair is in the history or not
-        for (m=0;m<n;m++) {
-            if (temp[0]==pairs[m][0] && temp[2]==pairs[m][1]) flag = 1;
-            if (temp[2]==pairs[m][0] && temp[0]==pairs[m][1]) flag = 1;
-        }
+
         
         // Save pairs in history
         if (flag==0) {
-            pairs.resize(n+1);
-            for (m=0;m<=n;m++) {
-                pairs.at(m).resize(2);
-            }
-            pairs[n][0] = temp[0];
-            pairs[n][1] = temp[2];
-            
+            n++;
             tempList = copyList(P, 0, num_nodes-1); //create templist ##1
-            
-           // tempList.flipNodes(temp[1], temp[3]);
-        
-            
             p = tempList->head;
             while (1) {
                 if (p->data==temp[1]) p1 = p;
@@ -254,8 +239,6 @@ doublylinkedlist* rayOpt(doublylinkedlist* Path,int NUMITERATIONS) //number of i
             current_distance = tempList->getDistance();
             //delete tempList;
             
-            //printf("%d. Trying flip: (%d %d)(%d %d), distance = %f\n",n,temp[0],temp[1],temp[2],temp[3],current_distance);
-            
             if (current_distance<best_distance) {
                 best_distance = current_distance; // Update best distance
 
@@ -264,17 +247,11 @@ doublylinkedlist* rayOpt(doublylinkedlist* Path,int NUMITERATIONS) //number of i
                 P = copyList(tempList,0,num_nodes-1);
 
                 n = 0;
-            } 
-            else {
-            	n++;
             }
             delete tempList;
         }
     }
-    //printf("debugBEST = %f\n",best_distance);
     P->end = P->head ->prev;
-    //P->displayforward();
-    //printf("\n");
     return P;
 }
 
@@ -292,7 +269,7 @@ doublylinkedlist* starOpt(doublylinkedlist* Path, int K,int NUMITERATIONS)
     int flag,matches;
     float current_distance = 0; // starting distance
     float best_distance = P->getDistance(); // starting best distance
-    vector < vector <int> > pairs;
+   // vector < vector <int> > pairs;
     doublylinkedlist* tempList;
     //tempList= new doublylinkedlist();
     
@@ -314,32 +291,10 @@ doublylinkedlist* starOpt(doublylinkedlist* Path, int K,int NUMITERATIONS)
             if (flag==0) k++;
         }
         
-        // Make sure pairs have not been seen in history
-        flag = 0;
-        for (m=0;m<n;m++) {
-            matches = 0;
-            for (k=0;k<K;k++) {
-                for (i=0;i<K;i++) {
-                    //matches += temp[2*i]==pairs[m][2*k];
-                }
-            }
-            if (matches==K) {
-                flag = 1;
-                break;
-            }
-        }
         
-        // Test pairs
+        // flag indicates that the apir is legal to move on
         if (flag==0) {
-            //            // Save pairs in history
-            //            pairs.resize(n+1);
-            //            for (m=0;m<=n;m++) {
-            //                pairs.at(m).resize(2*K);
-            //            }
-            //            for (k=0;k<K;k++) {
-            //                pairs[n][2*k] = temp[2*k];
-            //                pairs[n][2*k+1] = temp[2*k+1];
-            //            }
+
             n++;
             
             tempList = copyList(P,0,num_nodes-1);
@@ -372,16 +327,11 @@ doublylinkedlist* starOpt(doublylinkedlist* Path, int K,int NUMITERATIONS)
             
             // Check distance
             current_distance = tempList->getDistance();
-            //printf("%d. Trying flip, distance = %f\n",n,current_distance);
-            //for (k=0;k<K;k++) printf("%d ",temp[2*k]);
-            //printf("\n");
+
             
             if (current_distance<best_distance) {
                 best_distance = current_distance;
-                //printf("BEST = %f\n",best_distance);
                 delete P;
-               	//P->doublylinkedlist::~doublylinkedlist();
-            	//tempList->displayforward();cout<<endl<<endl;
                 P = copyList(tempList,0,num_nodes-1);
                 n = 0;
             }
@@ -395,6 +345,7 @@ doublylinkedlist* starOpt(doublylinkedlist* Path, int K,int NUMITERATIONS)
 
 //TwoOpt takes in a list, ouputs swapped two nodes (4 edges, 2 adjacent pairs)
 //Memory Warning: This function always creates a new list, and it will return the newly created one
+//Original implementation has history check, now we don't
 doublylinkedlist* TwoOpt(doublylinkedlist* Path, int NUMITERATIONS)
 {
 	
@@ -410,11 +361,11 @@ doublylinkedlist* TwoOpt(doublylinkedlist* Path, int NUMITERATIONS)
     float current_distance = 0;
     float best_distance = P->getDistance();
 	//start a history records of which pair 
-    vector<vector<int> > pairs;
+   // vector<vector<int> > pairs;
     doublylinkedlist* tempList;
     //tempList= new doublylinkedlist();
     
-    while (n < NUMITERATIONS && n < num_nodes*(num_nodes-3)/2) { //
+    while (n < NUMITERATIONS){// && n < num_nodes*(num_nodes-3)/2) { //
         // Get pairs
         flag = 0;
         
@@ -428,20 +379,12 @@ doublylinkedlist* TwoOpt(doublylinkedlist* Path, int NUMITERATIONS)
         
         //check if the pair are adjacent or if the nodes are the same
         if (temp[0]==temp[2] || temp[0]==temp[3] || temp[1]==temp[2]) flag = 1;
-        //check if this pair is in the history or not
-        for (m=0;m<n;m++) {
-            if (temp[0]==pairs[m][0] && temp[2]==pairs[m][1]) flag = 1;
-            if (temp[2]==pairs[m][0] && temp[0]==pairs[m][1]) flag = 1;
-        }
+
         
         // Save pairs in history
         if (flag==0) {
-            pairs.resize(n+1);
-            for (m=0;m<=n;m++) {
-                pairs.at(m).resize(2);
-            }
-            pairs[n][0] = temp[0];
-            pairs[n][1] = temp[2];
+            n++;
+
             
             tempList = copyList(P, 0, num_nodes-1); //create tempList ##1
             
@@ -456,7 +399,7 @@ doublylinkedlist* TwoOpt(doublylinkedlist* Path, int NUMITERATIONS)
                 delete P;
                 P = copyList(tempList,0,num_nodes-1);
                 n = 0;
-            } else n++;
+            } 
             delete tempList;
         }
         
