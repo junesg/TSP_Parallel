@@ -20,13 +20,17 @@ void quickSortProperties(
 			double *timeTaken,  
 			double *index, 
 			int left, 
-			int right) ;
+			int right);
+
+void BreedingMethod (const int sizeWorld, LinkedHashEntry** nextRoundMethods, const double* index);
 
 double conver_time_measure (double* converg, double* time, int pivot) ;
 
 void extractStrategy( vector<double> *incomingMessage,vector<double> *output) ;
 
-void mixedStrategy(vector<double>* s1, vector<double>* s2) ;
+vector<double> mixedStrategy(vector<double>* s1, vector<double>* s2);
+
+void mutateStrategy(vector<double>* strategy);
 
 static doublylinkedlist* slave(
                   string filename,

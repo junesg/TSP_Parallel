@@ -100,7 +100,6 @@ void PopulationBreeding(std::vector<doublylinkedlist*>* group, double fitDistanc
 			i++;
 		}
         
-        
         breedCount ++;
         delete aList;
 	}

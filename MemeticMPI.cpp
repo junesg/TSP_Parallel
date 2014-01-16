@@ -26,14 +26,14 @@ using namespace std;
 #define DIETAG 2
 #define EXITTAG 3
 #define ITERATION 2048 //each round of individual island development, we have this number of iterations
-#define MEMETICFREQUENCY  0.8 //These proportion of communication has been going on
-#define DEBUG
-
+#define STRATEGYMUTATE 0.10 //rate of mutation of the strategy
+//#define DEBUG
 
 
 //#define DEBUG
 int main(int argc, char** argv)
 {
+    
 	/* Initialize MPI environment */
     int rankWorld;
     int sizeWorld;
@@ -97,9 +97,10 @@ int main(int argc, char** argv)
         MPI_Barrier(MPI_COMM_WORLD);
     }
     
-    printf("Final Convergence is %f\n",convergence);
-    if(rankWorld == 0) printf(" filename is "); cout<<filename<<endl;
-    
+    //printf("Final Convergence is %f\n",convergence);
+    if(rankWorld == 0) {
+        printf(" filename is "); cout<<filename<<endl;
+    }
     /* Shut down MPI */
     MPI_Finalize();
     
@@ -181,6 +182,7 @@ void singleRoundImprovement(doublylinkedlist* solutionDLL,
  * It then receives the resulting convergence rate from the slaves. 
  */
 static double master() {
+    
   	int sizeWorld, messageLength;
   	int source;
   	MPI_Status status;
@@ -198,7 +200,9 @@ static double master() {
     for (int i=0; i<sizeWorld-1; i++) {
         nextRoundMethods[i] = new LinkedHashEntry(i);
     }
-    
+    double convergenceAR[(int)sizeWorld-1];
+    double timeTaken[(int)sizeWorld-1];
+    double index[(int)sizeWorld-1];
 
 	
     /*first we send out first round of method allocation*/
@@ -220,9 +224,7 @@ static double master() {
   while (overallConvergence > 1/10000) {
 		//printf("DEBG1!\n");
   		//int receiveCount = 0;
-  		double convergenceAR[(int)sizeWorld-1];
-  		double timeTaken[(int)sizeWorld-1];
-  		double index[(int)sizeWorld-1];
+
        // printf("DEBG2!\n");
 
   		/* Loop through all results from slaves have been received */
@@ -244,23 +246,23 @@ static double master() {
             //MEssage: time, convergence, series
 			convergenceAR[(int)source-1] = (double)incomingMessage[1];
 			timeTaken[(int)source-1] = (double)incomingMessage[0];
-			index[(int)source-1] = source;
+			index[(int)source-1] = source-1;
 			
 			vector<double>* message = new vector<double>((int)messageLength);
             
             
-            printf("incoming message from %d\n",source);
-			for(int i=0; i< messageLength; i++) {
-				message->at(i)= incomingMessage[i];
-                printf("%f,", message->at(i));
-            }
-            printf("\n");
+//            printf("incoming message from %d\n",source);
+//			for(int i=0; i< messageLength; i++) {
+//				message->at(i)= incomingMessage[i];
+//                printf("%f,", message->at(i));
+//            }
+//            printf("\n");
             
 			historyOfCommands->put(source-1, message);
             vector<double>* strategyContent = new vector<double>((int)messageLength-2);
             extractStrategy(message, strategyContent);
             nextRoundMethods[((int)source-1)]->setValue(strategyContent);
-
+//
 //#ifdef DEBUG
 //            printf("strategy content for %d processor: ", source);
 //            for (int i = 0 ; i<messageLength-2; i++) {
@@ -280,21 +282,12 @@ static double master() {
 
 		if (overallConvergence < 1/10000) break; //exit while loop if convergence has reached the standard.
 		
-		/* Now process the results of this round, prepare for crossing of methods */
-      
-		for	(int i = 0; i < (int)(sizeWorld * MEMETICFREQUENCY) ;  i++) {
-			//mixed strategy of the better strategies and the less effective strategies
-            //randomly select a strategy from the faster half
-            srand(time(NULL)+i);
-            //int index1 = rand()%((int)(sizeWorld-1)/2);
-            int index1 = rand()%((int)(sizeWorld-1));
-            //randomly select a strategy from the slower half
-            //int index2 = sizeWorld-2 - rand()%((sizeWorld-1)/2);
-            int index2 = rand()%((int)(sizeWorld-1));
-			mixedStrategy(nextRoundMethods[index1]->getValue(), nextRoundMethods[index2]->getValue());
-		}
-      
-
+#ifdef DEBUG
+      printf("DEBUG!!!\n");
+#endif
+		/* Now process the results of the effectiveness of methods in this round, prepare for crossing of methods */
+        BreedingMethod (sizeWorld,nextRoundMethods, index);
+     
 
 		for(int sourceI = 1; sourceI < sizeWorld; sourceI++) {
 			/* Send a new round : (double)NumberInMethod, method array, and send the method iteration array */
@@ -375,6 +368,109 @@ void quickSortProperties( double *convergence,  double *timeTaken,  double *inde
         quickSortProperties(convergence, timeTaken, index, i, right);
 }
 
+
+/* helper function to breed methods that have better peformances 
+ * The sizeWorld is the size of the World, it determines how many terms there are in nextRoundMethods and in index
+ * the nextRoundMethods is a hashed table, or an array of pointers to linkedhashentry. They stores the last methods that each processor has
+ * the index is an array of doubles, it stores the ranking (from the best method to the worst method) as fed back by the processor
+ * breedingmethod will, from here, first create new breeds, mutate, and substitute the less efficient methods
+ */
+void BreedingMethod (const int sizeWorld, LinkedHashEntry** nextRoundMethods, const double* index){
+    //largest rank of the breeding population
+    //$$$$$$$$$$$$$$$$$$$$$$$$$$ start breeding
+    double breedRate = 0.5;
+    //use this fraction of population to breed and replace the other 1-MEMETICBREED of the population of methods
+    int breedMA = (int)(((double)(sizeWorld -1))*breedRate);
+
+    //seed random
+    srand(time(NULL));
+    
+    int index1, index2;
+    
+    for (int i=breedMA; i < sizeWorld -2; i++) { //iterations to replace these
+        index1 = rand()%breedMA;
+        do {
+            index2 = rand()%breedMA;
+        }while(index1 == index2);
+        
+//#ifdef DEBUG
+//        printf("mutating %d and %d processors\n", (int)index[index1], (int)index[index2]);
+//        
+//#endif
+        
+        vector<double>* oneStrat = nextRoundMethods[(int)(index[index1])]->getValue();
+        vector<double>* twoStrat = nextRoundMethods[(int)(index[index2])]->getValue();
+        
+//#ifdef DEBUG
+//        printf("strat %d: has size %d\n",(int)(index[index1]), (int)oneStrat->size());
+//        for (int x = 0; x<oneStrat->size(); x++) {
+//            printf("%f,",oneStrat->at(x));
+//        }
+//        printf("\n");
+//#endif
+//        
+//#ifdef DEBUG
+//        printf("strat %d: ",(int)(index[index2]));
+//        for (int x = 0; x<twoStrat->size(); x++) {
+//            printf("%f,",twoStrat->at(x));
+//        }
+//        printf("\n");
+//#endif
+//        
+        
+        //new strategy is fromed by the better ones
+        vector<double> newStrategy = mixedStrategy(nextRoundMethods[(int)(index[index1])]->getValue(), nextRoundMethods[(int)(index[index2])]->getValue());
+//#ifdef DEBUG
+//        printf("newStrategy: ");
+//        for (int x = 0; x<newStrategy.size(); x++) {
+//            printf("%f,",newStrategy[x]);
+//        }
+//        printf("\n");
+//#endif
+        
+        mutateStrategy(&newStrategy);
+        //now put the new strategy into the appropriate population individual
+        vector<double>* toChange = nextRoundMethods[(int)(index[i])]->getValue();
+        toChange->clear();
+        toChange->insert(toChange->end(), newStrategy.begin(), newStrategy.end());
+    }
+    //$$$$$$$$$$$$$$$$$$$$$$$$$$ start breeding
+
+}
+
+
+/*
+ * This function serves to mutate the strategic method used in s1 and s2 separately
+ * It serves as part of the memetic local improvement algorithm
+ */
+void mutateStrategy(vector<double>* strategy) {
+    //first calculate how many strategies there are
+    
+#ifdef DEBUG
+    printf("original strategy before mutation: ");
+    for (int x = 0; x<strategy->size(); x++) {
+        printf("%f,",strategy->at(x));
+    }
+    printf("\n");
+#endif
+    
+    int count = strategy->size()/2;
+    //then mutate with rate STRATEGYMUTATE
+    for (int i = 0; i < STRATEGYMUTATE*count; i++) {
+        strategy->at(rand()%count) = rand()%6; //randomly select the method to mutate to
+    }
+    
+#ifdef DEBUG
+    printf("original strategy after mutation: ");
+    for (int x = 0; x<strategy->size(); x++) {
+        printf("%f,",strategy->at(x));
+    }
+    printf("\n");
+#endif
+}
+
+
+
 /* helper function to define the criteria for sorting */
 //criteria: good method: large convergence and small time
 double conver_time_measure (double* converg, double* time, int pivot) {
@@ -394,7 +490,7 @@ void extractStrategy( vector<double> *incomingMessage,vector<double> *output) {
 
 /* mixes the strategy from s1 and s2 together */
 /** preset at 1:1 mixing */
-void mixedStrategy(vector<double>* s1, vector<double>* s2) {
+vector<double> mixedStrategy(vector<double>* s1, vector<double>* s2) {
     
 	double count1, count2;
 	count1 = (double)s1->size()/2;
@@ -403,11 +499,11 @@ void mixedStrategy(vector<double>* s1, vector<double>* s2) {
 	/* First check that if s1 and s2 are no longer divisible*/
 	for(int i=count1; i < s1->size(); i++) {
 		if (s1->at(i) <= 1)
-			return;
+			return *s1;
 	}
 	for(int i=count2; i < s2->size(); i++) {
 		if (s2->at(i) <= 1)
-			return;
+			return *s2;
 	}
 	
 	vector<double> method1, method2;
@@ -422,19 +518,14 @@ void mixedStrategy(vector<double>* s1, vector<double>* s2) {
 		iter2.push_back ((s2->at(count2+i))/2);
 	}
 	
-	s1-> clear();
-	s2-> clear();
+    vector<double> newStrategy;
 	
-	
-	s1-> insert( s1->end(), method1.begin(), method1.end());
-	s1-> insert( s1->end(), method2.begin(), method2.end());
-	s1-> insert( s1->end(), iter1.begin(), iter1.end());
-	s1-> insert( s1->end(), iter2.begin(), iter2.end());
+	newStrategy.insert( newStrategy.end(), method1.begin(), method1.end());
+	newStrategy.insert( newStrategy.end(), method2.begin(), method2.end());
+	newStrategy.insert( newStrategy.end(), iter1.begin(), iter1.end());
+	newStrategy.insert( newStrategy.end(), iter2.begin(), iter2.end());
     
-	s2-> insert( s2->end(), method2.begin(), method2.end());
-	s2-> insert( s2->end(), method1.begin(), method1.end());
-	s2-> insert( s2->end(), iter2.begin(), iter2.end());
-	s2-> insert( s2->end(), iter1.begin(), iter1.end());
+    return newStrategy;
     
 }
 

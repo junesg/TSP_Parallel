@@ -17,9 +17,9 @@
 #define POPULATION 100	//the initial population generated
 //criterial for population  <= all combinations (n-1)!
 #define breedPop 30 //the size of the breeding population
-#define MUTATION 30 //how many links we mutate
+#define MUTATION 10 //how many links we mutate
 //#define LISTSIZE 10 //size of the list --> will be replaced in the future by automatic size detection
-#define MAXBREEDITERATION 30
+#define MAXBREEDITERATION 20
 
 
 
