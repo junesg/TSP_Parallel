@@ -254,6 +254,7 @@ static double master() {
             
             for(int i=0; i< messageLength; i++) {
 				message->at(i)= incomingMessage[i];
+                printf("%f,", message->at(i));
             }
             
 			historyOfCommands->put(source-1, message);
