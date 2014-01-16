@@ -261,17 +261,18 @@ static double master() {
             extractStrategy(message, strategyContent);
             nextRoundMethods[((int)source-1)]->setValue(strategyContent);
 
-#ifdef DEBUG
-            printf("strategy content for %d processor: ", source);
-            for (int i = 0 ; i<messageLength-2; i++) {
-                printf("%f, ", nextRoundMethods[((int)source-1)]->getValue()->at(i));
-            }
-            printf("\n");
-#endif
+//#ifdef DEBUG
+//            printf("strategy content for %d processor: ", source);
+//            for (int i = 0 ; i<messageLength-2; i++) {
+//                printf("%f, ", nextRoundMethods[((int)source-1)]->getValue()->at(i));
+//            }
+//            printf("\n");
+//#endif
 		}
       
       		//free(incomingMessage);
 		/*sort the converge and timing performance */
+        //better methods stay in front, worst methods stay a the back
 		quickSortProperties(convergenceAR, timeTaken, index, 0, (int)sizeWorld-2 );
 
 		/*store the biggest convergence value == fastest rate of convergence */
@@ -346,12 +347,12 @@ void quickSortProperties( double *convergence,  double *timeTaken,  double *inde
     double pivot = conver_time_measure(convergence, timeTaken, ((left + right) / 2));
     
     /* partition */
-    while (i <= j) {
+    while (i <= j) { //smaller measurement  == better methods stay in front of the array
         while (conver_time_measure(convergence, timeTaken, i) <
                pivot)
             i++;
         while (conver_time_measure (convergence, timeTaken, j)>
-               pivot)
+               pivot) //bigger measurement == worse methods stay in the latter half of the array
             j--;
         if (i <= j) {
 			tmpInd = index[i];
@@ -375,8 +376,9 @@ void quickSortProperties( double *convergence,  double *timeTaken,  double *inde
 }
 
 /* helper function to define the criteria for sorting */
+//criteria: good method: large convergence and small time
 double conver_time_measure (double* converg, double* time, int pivot) {
-	return (converg[pivot])*(time[pivot]);
+	return (time[pivot])/(converg[pivot]);
 }
 
 
