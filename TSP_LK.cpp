@@ -192,10 +192,9 @@ doublylinkedlist* rayOpt(doublylinkedlist* Path,int NUMITERATIONS) //number of i
     float best_distance = P->getDistance();
     doublylinkedlist* tempList;
     
-    while (n < NUMITERATIONS && n < num_nodes*(num_nodes-3)/2) {
+    while (n < NUMITERATIONS) {
         // Get pairs
         flag = 0;
-        
         temp[0] = rand() % num_nodes ;
         //cout<<"temp0 is "<<temp[0];
         //cout<<"number of nodes: "<<num_nodes<<endl;
