@@ -5,7 +5,7 @@
 #include "doublylinked.h"
 
 
-#define MAXDEPTH 30
+#define MAXDEPTH 100
 
 using namespace std;
 

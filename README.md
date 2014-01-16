@@ -53,5 +53,16 @@ ONE OF THE PROBLEM Of current:
   mpic++ MemeticMPI.cpp doublylinked.cpp MST.cpp GA.cpp graph.cpp TSP_LK.cpp DisjointSets.cpp -g
  
 
+To Compile:
 mpic++ MemeticMPI.cpp doublylinked.cpp MST.cpp GA.cpp graph.cpp TSP_LK.cpp DisjointSets.cpp -g
 mpirun -np 6 ./a.out
+
+g++ memeticSerial.cpp doublylinked.cpp MST.cpp GA.cpp graph.cpp TSP_LK.cpp DisjointSets.cpp -g
+./a.out
+
+
+When running in flux (MPI parallel super computer machine): 
+1. change file name 
+2. change iteration size
+3. In the serial: give a fixed amount of time
+4. adjust GA parameters, depth for LK and for two-opt , ray-opt and star opt
