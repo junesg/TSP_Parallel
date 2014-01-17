@@ -66,11 +66,15 @@ mpirun -np <number of processes> <program name and arguments>
 
 ###Compiler: I haven't the chance to write a make file yet, so this will do:
 To Compile:
-mpic++ MemeticMPI.cpp doublylinked.cpp MST.cpp GA.cpp graph.cpp TSP_LK.cpp DisjointSets.cpp -g
-mpirun -np 6 ./a.out
 
-g++ memeticSerial.cpp doublylinked.cpp MST.cpp GA.cpp graph.cpp TSP_LK.cpp DisjointSets.cpp -g
-./a.out
+####parallel
+ *  To Compile: mpic++ MemeticMPI.cpp doublylinked.cpp MST.cpp GA.cpp graph.cpp TSP_LK.cpp DisjointSets.cpp -o output
+
+ * To Run: mpirun -np 6 ./a.out
+
+####serial
+ * To Compile: g++ memeticSerial.cpp doublylinked.cpp MST.cpp GA.cpp graph.cpp TSP_LK.cpp DisjointSets.cpp -g
+ * To run: ./a.out
 
 
 When running in flux (MPI parallel super computer machine): 
