@@ -62,8 +62,8 @@ void retrieveStrategy(double* incomingMessage, vector<double> *MethodSequence, v
 int main(int argc, char** argv)
 {
 	/* Initialize serial environment */
-    string filename = "kroC100.tsp";
-    double timeLimit = 3;
+    string filename = "pr1002.tsp";
+    double timeLimit = 267.311;
     
     
     
@@ -75,7 +75,7 @@ int main(int argc, char** argv)
     std::vector<double> edgeWeight;
     std::vector<std::pair<int,int> > coordinates;
     std::vector<std::pair<int,int> > vertexPair;
-    doublylinkedlist* solutionDLL;
+   
     getEdgeWeight(&edgeWeight, &coordinates, &vertexPair, filename);
 
     
@@ -84,6 +84,7 @@ int main(int argc, char** argv)
     for (int methodCode = 0 ; methodCode < 6; methodCode ++) {
      /*method code changes from 0 to 5 */
         /*variables */
+		doublylinkedlist* solutionDLL;
         solutionDLL = startingDLL(filename);
         printf("Starting solution distance is : %f\n", solutionDLL->getDistance());
         
@@ -117,10 +118,12 @@ int main(int argc, char** argv)
         printf(" filename is "); cout<<filename<<endl;
         printf("Method is %d \n", methodCode);
         printf("==========================\n\n");
+		delete solutionDLL;
     }
     printf("&&&&&&&&&&&&&&&&&&&&&&&&&\n End of Single Method Loop Through: \n");
 
     
+//BELOW IS MULTIPLE LINE
     printf("\n\n\n&&&&&&&&&&&&&&&&&&&&&&&&&\n Multiple method combine Loop Through: \n");
     double incomingMessage[13] = {6,0,1,2,3,4,5, ITERATION/6, ITERATION/6,ITERATION/6,ITERATION/6,ITERATION/6,ITERATION/6};
         /*variables */
@@ -128,7 +131,7 @@ int main(int argc, char** argv)
     timeElapsed = 0;
     //initialize parameters to store the problem
     //initialize all the vectors for storing information of the problem.
-    delete solutionDLL;
+    doublylinkedlist* solutionDLL;
     solutionDLL = startingDLL(filename);
     vector<double> MethodSequence, MethodIteration;
     retrieveStrategy(incomingMessage, &MethodSequence, &MethodIteration);
